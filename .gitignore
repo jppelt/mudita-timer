@@ -1,0 +1,18 @@
+# Build outputs
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+
+# Android Studio
+.idea/
+*.iml
+local.properties
+
+# Signing keys — never commit these
+*.jks
+*.keystore
+
+# Gradle wrapper jar is intentionally tracked (required to bootstrap ./gradlew)
+!gradle/wrapper/gradle-wrapper.jar

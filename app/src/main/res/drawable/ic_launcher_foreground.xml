@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Hourglass icon drawn as a single filled polygon.
+    Path traces: top-left → top-right → right-neck → left-neck → top-left
+    then bottom triangle, forming a solid hourglass silhouette.
+    Stays well within the 72dp safe zone of the 108dp adaptive-icon canvas.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Solid hourglass silhouette -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="
+            M 20,18
+            L 88,18
+            L 58,52
+            L 58,56
+            L 88,90
+            L 20,90
+            L 50,56
+            L 50,52
+            Z" />
+</vector>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single layout; only one child is VISIBLE at a time.
+    No animations, no transitions, no motion — instant visibility swap.
+    Pure black (#000000) on white (#FFFFFF) throughout.
+    All buttons use custom drawables to eliminate the Material ripple/elevation.
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SETUP  — preset buttons + custom picker + start
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/viewSetup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="40dp" />
+
+        <!-- Preset row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/btn5min"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/preset_5"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn10min"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/preset_10"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn25min"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/preset_25"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <!-- Divider: solid lines flank the word "or" — no gray, no gradients -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="20dp">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/or"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/black" />
+        </LinearLayout>
+
+        <!-- Custom picker: [−]  25  [+] -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="4dp">
+
+            <Button
+                android:id="@+id/btnMinus"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/minus"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textAllCaps="false" />
+
+            <!-- Fixed 100dp width so the layout doesn't jitter as digits change -->
+            <TextView
+                android:id="@+id/tvCustomMin"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="25"
+                android:textColor="@color/black"
+                android:textSize="64sp"
+                android:fontFamily="monospace"
+                android:gravity="center" />
+
+            <Button
+                android:id="@+id/btnPlus"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/plus"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minutes"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/btn_filled"
+            android:stateListAnimator="@null"
+            android:text="@string/start"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TIMER  — large countdown + pause/resume + reset
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/viewTimer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <!--
+            96sp monospace: on an 800×480 E Ink screen this fills the width
+            nicely. Monospace prevents digit-width jitter on each tick.
+        -->
+        <TextView
+            android:id="@+id/tvCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25:00"
+            android:textColor="@color/black"
+            android:textSize="96sp"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="48dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnPauseResume"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/pause"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnReset"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/reset"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         DONE  — "Time's up" + start-again + back
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/viewDone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_up"
+            android:textColor="@color/black"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="48dp" />
+
+        <Button
+            android:id="@+id/btnStartAgain"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/btn_filled"
+            android:stateListAnimator="@null"
+            android:text="@string/start_again"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/btn_outline"
+            android:stateListAnimator="@null"
+            android:text="@string/back"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</FrameLayout>
