@@ -19,9 +19,9 @@ class MainActivity : Activity() {
     private enum class State { SETUP, RUNNING, PAUSED, DONE }
 
     private var state = State.SETUP
-    private var durationMs = DEFAULT_DURATION_MS   // the chosen duration
-    private var remainingMs = DEFAULT_DURATION_MS  // snapshot used while paused
-    private var endTimeMs = 0L                     // wall-clock target; rebuilt on resume
+    private var durationMs = DEFAULT_DURATION_MS
+    private var remainingMs = DEFAULT_DURATION_MS
+    private var endTimeMs = 0L
     private var customMinutes = DEFAULT_CUSTOM_MIN
 
     // ── Android objects ──────────────────────────────────────────────────────
@@ -52,20 +52,15 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        // If we were RUNNING when backgrounded, recalculate from wall clock.
         if (state == State.RUNNING && endTimeMs > 0) {
             val left = endTimeMs - System.currentTimeMillis()
-            if (left <= 0) {
-                onTimerFinished()
-            } else {
-                schedule(left)
-            }
+            if (left <= 0) onTimerFinished() else schedule(left)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        // Cancel the in-process timer; endTimeMs lets us reconstruct on resume.
+        // endTimeMs lets us reconstruct the correct remaining time on resume.
         timer?.cancel()
     }
 
@@ -80,11 +75,12 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         timer?.cancel()
+        handler.removeCallbacksAndMessages(null)
         toneGen?.release()
         super.onDestroy()
     }
 
-    // ── Setup helpers ────────────────────────────────────────────────────────
+    // ── Setup ────────────────────────────────────────────────────────────────
 
     private fun bindViews() {
         viewSetup      = findViewById(R.id.viewSetup)
@@ -108,12 +104,10 @@ class MainActivity : Activity() {
     }
 
     private fun wireListeners() {
-        // Preset buttons jump straight to running.
         findViewById<Button>(R.id.btn5min).setOnClickListener  { beginTimer(5) }
         findViewById<Button>(R.id.btn10min).setOnClickListener { beginTimer(10) }
         findViewById<Button>(R.id.btn25min).setOnClickListener { beginTimer(25) }
 
-        // Custom picker: clamp to 1–99.
         findViewById<Button>(R.id.btnMinus).setOnClickListener {
             if (customMinutes > 1) {
                 customMinutes--
@@ -127,10 +121,8 @@ class MainActivity : Activity() {
             }
         }
 
-        // Start uses whatever is shown in the custom picker.
         findViewById<Button>(R.id.btnStart).setOnClickListener { beginTimer(customMinutes) }
 
-        // Timer-screen controls.
         btnPauseResume.setOnClickListener {
             when (state) {
                 State.RUNNING -> pause()
@@ -138,9 +130,7 @@ class MainActivity : Activity() {
                 else          -> Unit
             }
         }
-        findViewById<Button>(R.id.btnReset).setOnClickListener { resetToSetup() }
-
-        // Done-screen controls.
+        findViewById<Button>(R.id.btnReset).setOnClickListener      { resetToSetup() }
         findViewById<Button>(R.id.btnStartAgain).setOnClickListener { beginMs(durationMs) }
         findViewById<Button>(R.id.btnBack).setOnClickListener       { resetToSetup() }
     }
@@ -203,19 +193,18 @@ class MainActivity : Activity() {
 
     // ── Display ──────────────────────────────────────────────────────────────
 
-    /** Flip the three view groups; update button label and screen-on flag. */
     private fun render() {
-        viewSetup.visibility = if (state == State.SETUP)                          View.VISIBLE else View.GONE
+        viewSetup.visibility = if (state == State.SETUP)                            View.VISIBLE else View.GONE
         viewTimer.visibility = if (state == State.RUNNING || state == State.PAUSED) View.VISIBLE else View.GONE
-        viewDone.visibility  = if (state == State.DONE)                           View.VISIBLE else View.GONE
+        viewDone.visibility  = if (state == State.DONE)                             View.VISIBLE else View.GONE
 
         btnPauseResume.text = getString(
             if (state == State.PAUSED) R.string.resume else R.string.pause
         )
 
-        // Keep display alive while countdown is running. On E Ink, holding
-        // the screen on costs essentially no backlight power; it ensures the
-        // process stays alive and the alarm fires on time.
+        // E Ink holds its image with no power; keeping the screen on while
+        // running costs little and ensures the process isn't deprioritized
+        // before the alarm fires.
         if (state == State.RUNNING) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
@@ -223,7 +212,6 @@ class MainActivity : Activity() {
         }
     }
 
-    /** Format millis as MM:SS, rounding to the nearest second. */
     private fun showTime(ms: Long) {
         val totalSec = (ms + 500L) / 1_000L
         tvCountdown.text = "%02d:%02d".format(totalSec / 60, totalSec % 60)
@@ -234,8 +222,6 @@ class MainActivity : Activity() {
     private fun playAlarm() {
         try {
             toneGen?.release()
-            // TONE_PROP_BEEP2: a clean two-frequency beep on the ALARM stream.
-            // We play it for 2 s then release the generator.
             toneGen = ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)
             toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP2, 2_000)
             handler.postDelayed({

@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Single layout; only one child is VISIBLE at a time.
-    No animations, no transitions, no motion — instant visibility swap.
-    Pure black (#000000) on white (#FFFFFF) throughout.
-    All buttons use custom drawables to eliminate the Material ripple/elevation.
--->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         SETUP  — preset buttons + custom picker + start
-         ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ── SETUP ─────────────────────────────────────────────────────────── -->
     <LinearLayout
         android:id="@+id/viewSetup"
         android:layout_width="match_parent"
@@ -31,7 +23,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="40dp" />
 
-        <!-- Preset row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,7 +68,7 @@
                 android:textAllCaps="false" />
         </LinearLayout>
 
-        <!-- Divider: solid lines flank the word "or" — no gray, no gradients -->
+        <!-- Solid rule + "or" + solid rule: no gray dividers on E Ink -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,7 +99,6 @@
                 android:background="@color/black" />
         </LinearLayout>
 
-        <!-- Custom picker: [−]  25  [+] -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -127,7 +117,7 @@
                 android:textSize="24sp"
                 android:textAllCaps="false" />
 
-            <!-- Fixed 100dp width so the layout doesn't jitter as digits change -->
+            <!-- Fixed width prevents layout reflow as the digit count changes -->
             <TextView
                 android:id="@+id/tvCustomMin"
                 android:layout_width="100dp"
@@ -172,9 +162,7 @@
 
     </LinearLayout>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         TIMER  — large countdown + pause/resume + reset
-         ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ── TIMER ─────────────────────────────────────────────────────────── -->
     <LinearLayout
         android:id="@+id/viewTimer"
         android:layout_width="match_parent"
@@ -184,10 +172,7 @@
         android:padding="24dp"
         android:visibility="gone">
 
-        <!--
-            96sp monospace: on an 800×480 E Ink screen this fills the width
-            nicely. Monospace prevents digit-width jitter on each tick.
-        -->
+        <!-- Monospace prevents per-tick layout shift as digit widths differ -->
         <TextView
             android:id="@+id/tvCountdown"
             android:layout_width="wrap_content"
@@ -231,9 +216,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         DONE  — "Time's up" + start-again + back
-         ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ── DONE ──────────────────────────────────────────────────────────── -->
     <LinearLayout
         android:id="@+id/viewDone"
         android:layout_width="match_parent"

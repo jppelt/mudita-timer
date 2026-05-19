@@ -2,9 +2,8 @@
 <resources>
 
     <!--
-        Parent is the framework's own Material Light theme — no AppCompat,
-        no Play Services, pure AOSP. We override every color to black/white
-        and strip out all window and widget animations.
+        Framework Material theme (no AppCompat, no Play Services, pure AOSP).
+        Every color is overridden to pure black or white.
     -->
     <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
@@ -14,15 +13,13 @@
         <item name="android:statusBarColor">@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
 
-        <!-- Disable ALL window-level transition animations. On E Ink, slide/fade
-             transitions produce a full-panel refresh flicker on entry/exit. -->
+        <!-- Activity open/close animations cause a full-panel refresh on E Ink. -->
         <item name="android:windowAnimationStyle">@style/NoWindowAnimation</item>
 
-        <!-- Apply our button style globally so we never get Material ripple/shadow. -->
+        <!-- Global button style prevents Material ripple/shadow on any Button. -->
         <item name="android:buttonStyle">@style/AppButton</item>
     </style>
 
-    <!-- Zero-duration window animations. -->
     <style name="NoWindowAnimation" parent="android:Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@null</item>
         <item name="android:activityOpenExitAnimation">@null</item>
@@ -36,7 +33,6 @@
         <item name="android:taskToFrontExitAnimation">@null</item>
     </style>
 
-    <!-- Base button style: no elevation animator, no ripple, our own background. -->
     <style name="AppButton" parent="android:Widget.Material.Button">
         <item name="android:stateListAnimator">@null</item>
         <item name="android:background">@drawable/btn_filled</item>
