@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Secondary action button: white fill, black 2dp border, black text.
-     Sharp corners match btn_filled for visual consistency. -->
+<!-- Secondary action button: white fill, black 2dp border, black text. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@color/white" />
     <stroke android:width="2dp" android:color="@color/black" />
+    <corners android:radius="10dp" />
 </shape>
