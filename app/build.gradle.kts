@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.muditatimer"
+    namespace = "com.mudita.timer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.muditatimer"
+        applicationId = "com.mudita.timer"
         minSdk = 28
         targetSdk = 31
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.muditatimer
+package com.mudita.timer
 
 import android.app.Activity
 import android.media.AudioManager
