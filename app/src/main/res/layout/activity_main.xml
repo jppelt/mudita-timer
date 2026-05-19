@@ -49,6 +49,14 @@
                 android:textAllCaps="false" />
         </LinearLayout>
 
+        <!-- Flexible spacer: visible in stopwatch mode to push Start toward center -->
+        <View
+            android:id="@+id/stopwatchSpacer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
         <!-- Preset buttons (hidden in stopwatch mode) -->
         <LinearLayout
             android:id="@+id/presetButtons"
@@ -364,7 +372,7 @@
             android:id="@+id/tvStopwatch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00:00"
+            android:text="00:00"
             android:textColor="@color/black"
             android:textSize="96sp"
             android:fontFamily="monospace"

@@ -297,11 +297,12 @@ class MainActivity : Activity() {
         btnModeStopwatch.setBackgroundResource(if (inStopwatch) R.drawable.btn_filled else R.drawable.btn_outline)
         btnModeStopwatch.setTextColor(getColor(if (inStopwatch) R.color.white else R.color.black))
 
-        // Show timer-specific controls only in timer mode
+        // Show timer-specific controls only in timer mode; spacer fills gap in stopwatch mode
         val timerOnlyVisibility = if (inStopwatch) View.GONE else View.VISIBLE
-        findViewById<View>(R.id.presetButtons).visibility     = timerOnlyVisibility
-        findViewById<View>(R.id.dividerOr).visibility         = timerOnlyVisibility
+        findViewById<View>(R.id.presetButtons).visibility      = timerOnlyVisibility
+        findViewById<View>(R.id.dividerOr).visibility          = timerOnlyVisibility
         findViewById<View>(R.id.customPickerLayout).visibility = timerOnlyVisibility
+        findViewById<View>(R.id.stopwatchSpacer).visibility    = if (inStopwatch) View.VISIBLE else View.GONE
 
         // Pause/resume label
         btnPauseResume.text = getString(if (state == State.PAUSED) R.string.resume else R.string.pause)
@@ -321,7 +322,8 @@ class MainActivity : Activity() {
 
     private fun formatElapsed(ms: Long): String {
         val s = ms / 1_000L
-        return "%02d:%02d:%02d".format(s / 3600, (s % 3600) / 60, s % 60)
+        return if (s < 3600) "%02d:%02d".format(s / 60, s % 60)
+               else          "%02d:%02d:%02d".format(s / 3600, (s % 3600) / 60, s % 60)
     }
 
     // ── Constants ────────────────────────────────────────────────────────────
