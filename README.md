@@ -4,12 +4,6 @@ A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/product
 
 ---
 
-## Screenshots
-
-_Coming soon._
-
----
-
 ## Features
 
 - **Two modes** — countdown timer and stopwatch, switchable from the setup screen
@@ -21,6 +15,15 @@ _Coming soon._
 - **Audible alarm** — a single clean tone when the timer ends, nothing more
 - **No distractions** — no notifications beyond the required foreground service notice, no history, no settings, no accounts
 - **Fully offline** — no network calls, no analytics, no permissions beyond what is necessary
+
+---
+
+## Screenshots
+
+![Timer Setup](screenshots/Timer%20Setup.png)
+![Timer Running](screenshots/Time%20Running.png)
+![Stopwatch](screenshots/Stopwatch.png)
+![Stopwatch Running](screenshots/Stopwatch%20Running.png)
 
 ---
 
