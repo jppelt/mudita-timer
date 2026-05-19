@@ -12,11 +12,14 @@ _Coming soon._
 
 ## Features
 
+- **Two modes** — countdown timer and stopwatch, switchable from the setup screen
 - **Three presets** — 5, 10, and 25 minutes, one tap to start
-- **Custom duration** — 1 to 99 minutes via a simple +/− picker
-- **Pause and resume** — picks up exactly where you left off, even if the app is backgrounded
+- **Custom duration** — set minutes (0–99) and seconds (0–59) via simple +/− pickers
+- **Stopwatch** — MM:SS display, pause and resume, reset to zero
+- **Runs in the background** — a foreground service keeps the timer accurate when the screen is off or the app is backgrounded
+- **Pause and resume** — picks up exactly where you left off
 - **Audible alarm** — a single clean tone when the timer ends, nothing more
-- **No distractions** — no notifications, no history, no settings, no accounts
+- **No distractions** — no notifications beyond the required foreground service notice, no history, no settings, no accounts
 - **Fully offline** — no network calls, no analytics, no permissions beyond what is necessary
 
 ---
@@ -89,12 +92,13 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 
 **Simplicity** — One screen per task. No menus, no history, no configuration beyond what the timer actually needs.
 
-**Energy efficiency** — No animations anywhere in the UI. The screen updates once per second while the timer runs and is otherwise still. No network calls, no background services, no wakelocks beyond keeping the display on while counting down.
+**Energy efficiency** — No animations anywhere in the UI. The screen updates once per second while the timer runs and is otherwise still. No network calls, no wakelocks.
 
 ---
 
 ## Technical notes
 
+- Version: 1.2.0
 - Language: Kotlin
 - Minimum SDK: 28 (Android 9)
 - Target SDK: 31 (Android 12 — matches MuditaOS K)
