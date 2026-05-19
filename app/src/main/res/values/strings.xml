@@ -9,7 +9,8 @@
     <string name="or">or</string>
     <string name="minus">−</string>
     <string name="plus">+</string>
-    <string name="minutes">minutes</string>
+    <string name="min">min</string>
+    <string name="sec">sec</string>
     <string name="start">Start</string>
 
     <!-- Timer screen -->

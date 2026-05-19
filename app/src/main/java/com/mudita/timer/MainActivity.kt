@@ -23,6 +23,7 @@ class MainActivity : Activity() {
     private var remainingMs = DEFAULT_DURATION_MS
     private var endTimeMs = 0L
     private var customMinutes = DEFAULT_CUSTOM_MIN
+    private var customSeconds = 0
 
     // ── Android objects ──────────────────────────────────────────────────────
 
@@ -36,6 +37,7 @@ class MainActivity : Activity() {
     private lateinit var viewTimer: View
     private lateinit var viewDone: View
     private lateinit var tvCustomMin: TextView
+    private lateinit var tvCustomSec: TextView
     private lateinit var tvCountdown: TextView
     private lateinit var btnPauseResume: Button
 
@@ -71,6 +73,7 @@ class MainActivity : Activity() {
         out.putLong(KEY_REMAINING, remainingMs)
         out.putLong(KEY_END_TIME, endTimeMs)
         out.putInt(KEY_CUSTOM_MIN, customMinutes)
+        out.putInt(KEY_CUSTOM_SEC, customSeconds)
     }
 
     override fun onDestroy() {
@@ -87,6 +90,7 @@ class MainActivity : Activity() {
         viewTimer      = findViewById(R.id.viewTimer)
         viewDone       = findViewById(R.id.viewDone)
         tvCustomMin    = findViewById(R.id.tvCustomMin)
+        tvCustomSec    = findViewById(R.id.tvCustomSec)
         tvCountdown    = findViewById(R.id.tvCountdown)
         btnPauseResume = findViewById(R.id.btnPauseResume)
     }
@@ -98,8 +102,10 @@ class MainActivity : Activity() {
             remainingMs   = bundle.getLong(KEY_REMAINING, DEFAULT_DURATION_MS)
             endTimeMs     = bundle.getLong(KEY_END_TIME, 0L)
             customMinutes = bundle.getInt(KEY_CUSTOM_MIN, DEFAULT_CUSTOM_MIN)
+            customSeconds = bundle.getInt(KEY_CUSTOM_SEC, 0)
         }
-        tvCustomMin.text = customMinutes.toString()
+        tvCustomMin.text = "%02d".format(customMinutes)
+        tvCustomSec.text = "%02d".format(customSeconds)
         showTime(remainingMs)
     }
 
@@ -109,19 +115,34 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.btn25min).setOnClickListener { beginTimer(25) }
 
         findViewById<Button>(R.id.btnMinus).setOnClickListener {
-            if (customMinutes > 1) {
+            if (customMinutes > 0) {
                 customMinutes--
-                tvCustomMin.text = customMinutes.toString()
+                tvCustomMin.text = "%02d".format(customMinutes)
             }
         }
         findViewById<Button>(R.id.btnPlus).setOnClickListener {
             if (customMinutes < 99) {
                 customMinutes++
-                tvCustomMin.text = customMinutes.toString()
+                tvCustomMin.text = "%02d".format(customMinutes)
+            }
+        }
+        findViewById<Button>(R.id.btnMinusSec).setOnClickListener {
+            if (customSeconds > 0) {
+                customSeconds--
+                tvCustomSec.text = "%02d".format(customSeconds)
+            }
+        }
+        findViewById<Button>(R.id.btnPlusSec).setOnClickListener {
+            if (customSeconds < 59) {
+                customSeconds++
+                tvCustomSec.text = "%02d".format(customSeconds)
             }
         }
 
-        findViewById<Button>(R.id.btnStart).setOnClickListener { beginTimer(customMinutes) }
+        findViewById<Button>(R.id.btnStart).setOnClickListener {
+            val totalMs = (customMinutes * 60 + customSeconds) * 1_000L
+            if (totalMs > 0) beginMs(totalMs)
+        }
 
         btnPauseResume.setOnClickListener {
             when (state) {
@@ -244,5 +265,6 @@ class MainActivity : Activity() {
         private const val KEY_REMAINING  = "remaining"
         private const val KEY_END_TIME   = "end_time"
         private const val KEY_CUSTOM_MIN = "custom_min"
+        private const val KEY_CUSTOM_SEC = "custom_sec"
     }
 }
