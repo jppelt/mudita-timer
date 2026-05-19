@@ -1,43 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Adaptive icon foreground — 108×108 dp canvas.
-    Safe zone: (18,18)→(90,90). All paths stay within that region.
-
-    Shape: hourglass with solid end plates.
-    The polygon traces (clockwise):
-      top-left cap → top-right cap
-      → right shoulder → right neck → right hip
-      → bottom-right cap → bottom-left cap
-      → left hip → left neck → left shoulder
-      → back to top-left cap
-
-    Dimensions (all within 72dp safe zone):
-      Width  : 68dp  (x 20–88)
-      Height : 72dp  (y 18–90)
-      Caps   :  8dp tall each
-      Neck   :  6dp wide × 4dp tall
--->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <!-- Pure white background — fills entire canvas, no shape, no shadow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,0 H108 V108 H0 Z" />
+
+    <!-- Black hourglass silhouette with solid end plates.
+         Width 68dp (x 20–88), height 72dp (y 18–90).
+         Caps 8dp tall, neck 6dp wide × 4dp tall. -->
     <path
         android:fillColor="#000000"
-        android:pathData="
-            M 20,18
-            L 88,18
-            L 88,26
-            L 57,52
-            L 57,56
-            L 88,82
-            L 88,90
-            L 20,90
-            L 20,82
-            L 51,56
-            L 51,52
-            L 20,26
-            Z" />
+        android:pathData="M20,18 L88,18 L88,26 L57,52 L57,56 L88,82 L88,90 L20,90 L20,82 L51,56 L51,52 L20,26 Z" />
 
 </vector>
