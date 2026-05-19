@@ -1,6 +1,6 @@
 # Mudita Timer
 
-A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/) — an E Ink Android phone designed for calm, focused living.
+A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/) — a distraction-free E Ink® phone built for less screen time, essential features, and a privacy focus.
 
 ---
 
