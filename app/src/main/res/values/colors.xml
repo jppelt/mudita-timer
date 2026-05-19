@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Two colors only. No grays, no gradients, no tints.
+    E Ink displays dither intermediate values into visible pixel patterns;
+    keeping strictly to pure black and white avoids all of that.
+-->
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+</resources>

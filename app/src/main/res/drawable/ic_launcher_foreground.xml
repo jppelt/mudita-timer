@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Pure white background — fills entire canvas, no shape, no shadow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,0 H108 V108 H0 Z" />
+
+    <!-- Hourglass outline. fillColor white keeps the interior opaque;
+         strokeColor/strokeWidth draw the 5dp black border. miterJoin
+         preserves the sharp geometric corners of the cap edges. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#000000"
+        android:strokeWidth="5"
+        android:strokeLineJoin="miter"
+        android:pathData="M20,18 L88,18 L88,26 L57,52 L57,56 L88,82 L88,90 L20,90 L20,82 L51,56 L51,52 L20,26 Z" />
+
+</vector>
