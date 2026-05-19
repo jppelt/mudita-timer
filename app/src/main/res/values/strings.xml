@@ -22,4 +22,18 @@
     <string name="time_up">Time\'s up</string>
     <string name="start_again">Start again</string>
     <string name="back">Back</string>
+
+    <!-- Mode toggle -->
+    <string name="mode_timer">Timer</string>
+    <string name="mode_stopwatch">Stopwatch</string>
+
+    <!-- Stopwatch screen -->
+    <string name="stopwatch_start">Start</string>
+    <string name="stopwatch_stop">Stop</string>
+    <string name="stopwatch_reset">Reset</string>
+
+    <!-- Foreground service notification -->
+    <string name="notification_channel_name">Mudita Timer</string>
+    <string name="notification_timer_running">Timer running</string>
+    <string name="notification_stopwatch_running">Stopwatch running</string>
 </resources>

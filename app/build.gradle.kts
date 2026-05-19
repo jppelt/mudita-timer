@@ -20,8 +20,8 @@ android {
         applicationId = "com.mudita.timer"
         minSdk = 28
         targetSdk = 31
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.2.0"
     }
 
     signingConfigs {

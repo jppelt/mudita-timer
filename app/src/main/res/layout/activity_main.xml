@@ -14,6 +14,40 @@
         android:gravity="center"
         android:padding="24dp">
 
+        <!-- Mode toggle: Timer | Stopwatch -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginBottom="32dp">
+
+            <Button
+                android:id="@+id/btnModeTimer"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/mode_timer"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnModeStopwatch"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/mode_stopwatch"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,7 +57,9 @@
             android:textStyle="bold"
             android:layout_marginBottom="40dp" />
 
+        <!-- Preset buttons (hidden in stopwatch mode) -->
         <LinearLayout
+            android:id="@+id/presetButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -68,8 +104,9 @@
                 android:textAllCaps="false" />
         </LinearLayout>
 
-        <!-- Solid rule + "or" + solid rule: no gray dividers on E Ink -->
+        <!-- "or" divider (hidden in stopwatch mode) -->
         <LinearLayout
+            android:id="@+id/dividerOr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -99,8 +136,9 @@
                 android:background="@color/black" />
         </LinearLayout>
 
-        <!-- Minutes and seconds pickers stacked vertically -->
+        <!-- Custom minute/second pickers (hidden in stopwatch mode) -->
         <LinearLayout
+            android:id="@+id/customPickerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -208,6 +246,7 @@
 
         </LinearLayout>
 
+        <!-- Start button: starts timer (timer mode) or stopwatch (stopwatch mode) -->
         <Button
             android:id="@+id/btnStart"
             android:layout_width="match_parent"
@@ -232,7 +271,6 @@
         android:padding="24dp"
         android:visibility="gone">
 
-        <!-- Monospace prevents per-tick layout shift as digit widths differ -->
         <TextView
             android:id="@+id/tvCountdown"
             android:layout_width="wrap_content"
@@ -318,6 +356,59 @@
             android:textSize="16sp"
             android:textAllCaps="false" />
 
+    </LinearLayout>
+
+    <!-- ── STOPWATCH ──────────────────────────────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/viewStopwatch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvStopwatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            android:textColor="@color/black"
+            android:textSize="96sp"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="48dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnStopwatchStartStop"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/stopwatch_stop"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnStopwatchReset"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/stopwatch_reset"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textAllCaps="false" />
+        </LinearLayout>
     </LinearLayout>
 
 </FrameLayout>
