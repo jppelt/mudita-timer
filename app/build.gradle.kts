@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+}
+
+// Signing credentials are read from keystore.properties (gitignored).
+// Copy keystore.properties.template → keystore.properties and fill in your values.
+val keystoreProps = Properties().also { props ->
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) props.load(f.inputStream())
 }
 
 android {
@@ -15,12 +24,20 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile     = keystoreProps["storeFile"]?.let { file(it.toString()) }
+            storePassword = keystoreProps["storePassword"]?.toString()
+            keyAlias      = keystoreProps["keyAlias"]?.toString()
+            keyPassword   = keystoreProps["keyPassword"]?.toString()
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt")
-            )
+            signingConfig   = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
 
