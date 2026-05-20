@@ -101,7 +101,7 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 
 ## Technical notes
 
-- Version: 1.2.0
+- Version: 1.3.0
 - Language: Kotlin
 - Minimum SDK: 28 (Android 9)
 - Target SDK: 31 (Android 12 — matches MuditaOS K)
