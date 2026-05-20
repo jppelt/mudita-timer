@@ -60,7 +60,6 @@ class MainActivity : Activity() {
                     }
                 }
                 TimerService.ACTION_STATE_PAUSED -> {
-                    // Re-sync display after resuming from background
                     if (svcMode == Mode.STOPWATCH.name) {
                         elapsedMs = ms
                         tvStopwatch.text = formatElapsed(ms)
@@ -72,10 +71,10 @@ class MainActivity : Activity() {
                     }
                 }
                 TimerService.ACTION_FINISHED -> {
-                    prefs().edit().remove(PREF_END_TIME_MS).apply()
                     remainingMs = 0
                     tvCountdown.text = formatRemaining(0L)
                     state = State.DONE
+                    prefs().edit().remove(PREF_END_TIME_MS).apply()
                     render()
                 }
             }
@@ -103,15 +102,15 @@ class MainActivity : Activity() {
         }
         registerReceiver(serviceReceiver, filter)
 
-        // If the timer finished while the app was backgrounded the broadcast was
-        // lost. Check the persisted end time and transition to DONE if it has passed.
+        // If the timer expired while the app was backgrounded the broadcast was
+        // missed. Check the persisted end time and transition to DONE locally.
         if (state == State.RUNNING) {
-            val storedEnd = prefs().getLong(PREF_END_TIME_MS, 0L)
-            if (storedEnd > 0L && storedEnd <= System.currentTimeMillis()) {
-                prefs().edit().remove(PREF_END_TIME_MS).apply()
+            val endTimeMs = prefs().getLong(PREF_END_TIME_MS, 0L)
+            if (endTimeMs > 0L && System.currentTimeMillis() >= endTimeMs) {
                 remainingMs = 0
                 tvCountdown.text = formatRemaining(0L)
                 state = State.DONE
+                prefs().edit().remove(PREF_END_TIME_MS).apply()
                 render()
                 return
             }
@@ -137,10 +136,6 @@ class MainActivity : Activity() {
         out.putInt(KEY_CUSTOM_SEC, customSeconds)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     // ── Setup ────────────────────────────────────────────────────────────────
 
     private fun bindViews() {
@@ -159,8 +154,8 @@ class MainActivity : Activity() {
     }
 
     private fun loadMode() {
-        mode = if (prefs().getString(PREF_LAST_MODE, Mode.TIMER.name) == Mode.STOPWATCH.name)
-            Mode.STOPWATCH else Mode.TIMER
+        val saved = prefs().getString(PREF_LAST_MODE, Mode.TIMER.name)
+        mode = if (saved == Mode.STOPWATCH.name) Mode.STOPWATCH else Mode.TIMER
     }
 
     private fun restoreState(bundle: Bundle?) {
@@ -204,7 +199,7 @@ class MainActivity : Activity() {
             if (customSeconds < 59) { customSeconds++; tvCustomSec.text = "%02d".format(customSeconds) }
         }
 
-        // Start button: starts timer or stopwatch depending on active mode
+        // Start button
         findViewById<Button>(R.id.btnStart).setOnClickListener {
             if (mode == Mode.TIMER) {
                 val ms = (customMinutes * 60 + customSeconds) * 1_000L
@@ -228,7 +223,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.btnStartAgain).setOnClickListener { startTimer(durationMs) }
         findViewById<Button>(R.id.btnBack).setOnClickListener       { resetToSetup() }
 
-        // Stopwatch: stop/resume toggle (Start is handled by btnStart on setup screen)
+        // Stopwatch controls
         btnStopwatchStartStop.setOnClickListener {
             when (state) {
                 State.STOPWATCH_RUNNING -> {
@@ -280,15 +275,13 @@ class MainActivity : Activity() {
     }
 
     private fun resetToSetup() {
-        prefs().edit().remove(PREF_END_TIME_MS).apply()
         sendToService(TimerService.ACTION_RESET)
+        prefs().edit().remove(PREF_END_TIME_MS).apply()
         state            = State.SETUP
         remainingMs      = durationMs
         tvCountdown.text = formatRemaining(durationMs)
         render()
     }
-
-    private fun prefs() = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
     private fun sendToService(action: String, extras: Intent.() -> Unit = {}) {
         startService(Intent(this, TimerService::class.java).apply {
@@ -300,8 +293,8 @@ class MainActivity : Activity() {
     // ── Render ───────────────────────────────────────────────────────────────
 
     private fun render() {
-        val inStopwatch = mode == Mode.STOPWATCH
-        val swActive    = state == State.STOPWATCH_RUNNING || state == State.STOPWATCH_PAUSED
+        val inStopwatch  = mode == Mode.STOPWATCH
+        val swActive     = state == State.STOPWATCH_RUNNING || state == State.STOPWATCH_PAUSED
         val timerTicking = state == State.RUNNING || state == State.PAUSED
 
         viewSetup.visibility     = if (!timerTicking && !swActive && state != State.DONE) View.VISIBLE else View.GONE
@@ -309,23 +302,18 @@ class MainActivity : Activity() {
         viewDone.visibility      = if (state == State.DONE)  View.VISIBLE else View.GONE
         viewStopwatch.visibility = if (swActive)             View.VISIBLE else View.GONE
 
-        // Mode toggle button styles
         btnModeTimer.setBackgroundResource(if (inStopwatch) R.drawable.btn_outline else R.drawable.btn_filled)
         btnModeTimer.setTextColor(getColor(if (inStopwatch) R.color.black else R.color.white))
         btnModeStopwatch.setBackgroundResource(if (inStopwatch) R.drawable.btn_filled else R.drawable.btn_outline)
         btnModeStopwatch.setTextColor(getColor(if (inStopwatch) R.color.white else R.color.black))
 
-        // Show timer-specific controls only in timer mode; spacer fills gap in stopwatch mode
         val timerOnlyVisibility = if (inStopwatch) View.GONE else View.VISIBLE
         findViewById<View>(R.id.presetButtons).visibility      = timerOnlyVisibility
         findViewById<View>(R.id.dividerOr).visibility          = timerOnlyVisibility
         findViewById<View>(R.id.customPickerLayout).visibility = timerOnlyVisibility
         findViewById<View>(R.id.stopwatchSpacer).visibility    = if (inStopwatch) View.VISIBLE else View.GONE
 
-        // Pause/resume label
         btnPauseResume.text = getString(if (state == State.PAUSED) R.string.resume else R.string.pause)
-
-        // Stopwatch stop/resume label
         btnStopwatchStartStop.text = getString(
             if (state == State.STOPWATCH_RUNNING) R.string.stopwatch_stop else R.string.stopwatch_start
         )
@@ -343,6 +331,10 @@ class MainActivity : Activity() {
         return if (s < 3600) "%02d:%02d".format(s / 60, s % 60)
                else          "%02d:%02d:%02d".format(s / 3600, (s % 3600) / 60, s % 60)
     }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private fun prefs() = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
     // ── Constants ────────────────────────────────────────────────────────────
 
