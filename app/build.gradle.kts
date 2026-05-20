@@ -13,11 +13,11 @@ val keystoreProps = Properties().also { props ->
 }
 
 android {
-    namespace = "com.mudita.timer"
+    namespace = "com.jppelt.muditatimer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mudita.timer"
+        applicationId = "com.jppelt.muditatimer"
         minSdk = 28
         targetSdk = 31
         versionCode = 2

@@ -1,4 +1,4 @@
-package com.mudita.timer
+package com.jppelt.muditatimer
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -72,6 +72,7 @@ class MainActivity : Activity() {
                     }
                 }
                 TimerService.ACTION_FINISHED -> {
+                    prefs().edit().remove(PREF_END_TIME_MS).apply()
                     remainingMs = 0
                     tvCountdown.text = formatRemaining(0L)
                     state = State.DONE
@@ -101,6 +102,21 @@ class MainActivity : Activity() {
             addAction(TimerService.ACTION_STATE_PAUSED)
         }
         registerReceiver(serviceReceiver, filter)
+
+        // If the timer finished while the app was backgrounded the broadcast was
+        // lost. Check the persisted end time and transition to DONE if it has passed.
+        if (state == State.RUNNING) {
+            val storedEnd = prefs().getLong(PREF_END_TIME_MS, 0L)
+            if (storedEnd > 0L && storedEnd <= System.currentTimeMillis()) {
+                prefs().edit().remove(PREF_END_TIME_MS).apply()
+                remainingMs = 0
+                tvCountdown.text = formatRemaining(0L)
+                state = State.DONE
+                render()
+                return
+            }
+        }
+
         if (state in setOf(State.RUNNING, State.PAUSED, State.STOPWATCH_RUNNING, State.STOPWATCH_PAUSED)) {
             sendToService(TimerService.ACTION_REQUEST_STATE)
         }
@@ -143,9 +159,8 @@ class MainActivity : Activity() {
     }
 
     private fun loadMode() {
-        val saved = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-            .getString(PREF_LAST_MODE, Mode.TIMER.name)
-        mode = if (saved == Mode.STOPWATCH.name) Mode.STOPWATCH else Mode.TIMER
+        mode = if (prefs().getString(PREF_LAST_MODE, Mode.TIMER.name) == Mode.STOPWATCH.name)
+            Mode.STOPWATCH else Mode.TIMER
     }
 
     private fun restoreState(bundle: Bundle?) {
@@ -242,8 +257,7 @@ class MainActivity : Activity() {
 
     private fun setMode(m: Mode) {
         mode = m
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit()
-            .putString(PREF_LAST_MODE, m.name).apply()
+        prefs().edit().putString(PREF_LAST_MODE, m.name).apply()
         render()
     }
 
@@ -252,6 +266,7 @@ class MainActivity : Activity() {
         remainingMs      = ms
         tvCountdown.text = formatRemaining(ms)
         state            = State.RUNNING
+        prefs().edit().putLong(PREF_END_TIME_MS, System.currentTimeMillis() + ms).apply()
         sendToService(TimerService.ACTION_START_TIMER) { putExtra(TimerService.EXTRA_DURATION_MS, ms) }
         render()
     }
@@ -265,12 +280,15 @@ class MainActivity : Activity() {
     }
 
     private fun resetToSetup() {
+        prefs().edit().remove(PREF_END_TIME_MS).apply()
         sendToService(TimerService.ACTION_RESET)
         state            = State.SETUP
         remainingMs      = durationMs
         tvCountdown.text = formatRemaining(durationMs)
         render()
     }
+
+    private fun prefs() = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
     private fun sendToService(action: String, extras: Intent.() -> Unit = {}) {
         startService(Intent(this, TimerService::class.java).apply {
@@ -334,6 +352,7 @@ class MainActivity : Activity() {
 
         private const val PREFS_NAME          = "mudita_prefs"
         private const val PREF_LAST_MODE      = "last_mode"
+        private const val PREF_END_TIME_MS    = "end_time_ms"
 
         private const val KEY_STATE           = "state"
         private const val KEY_DURATION        = "duration"

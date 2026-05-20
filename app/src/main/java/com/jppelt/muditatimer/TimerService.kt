@@ -1,4 +1,4 @@
-package com.mudita.timer
+package com.jppelt.muditatimer
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -216,17 +216,17 @@ class TimerService : Service() {
     // ── Constants ────────────────────────────────────────────────────────────
 
     companion object {
-        const val ACTION_START_TIMER      = "com.mudita.timer.START_TIMER"
-        const val ACTION_START_STOPWATCH  = "com.mudita.timer.START_STOPWATCH"
-        const val ACTION_PAUSE            = "com.mudita.timer.PAUSE"
-        const val ACTION_RESUME           = "com.mudita.timer.RESUME"
-        const val ACTION_RESET            = "com.mudita.timer.RESET"
-        const val ACTION_STOP             = "com.mudita.timer.STOP"
-        const val ACTION_REQUEST_STATE    = "com.mudita.timer.REQUEST_STATE"
+        const val ACTION_START_TIMER      = "com.jppelt.muditatimer.START_TIMER"
+        const val ACTION_START_STOPWATCH  = "com.jppelt.muditatimer.START_STOPWATCH"
+        const val ACTION_PAUSE            = "com.jppelt.muditatimer.PAUSE"
+        const val ACTION_RESUME           = "com.jppelt.muditatimer.RESUME"
+        const val ACTION_RESET            = "com.jppelt.muditatimer.RESET"
+        const val ACTION_STOP             = "com.jppelt.muditatimer.STOP"
+        const val ACTION_REQUEST_STATE    = "com.jppelt.muditatimer.REQUEST_STATE"
 
-        const val ACTION_TICK             = "com.mudita.timer.TICK"
-        const val ACTION_FINISHED         = "com.mudita.timer.FINISHED"
-        const val ACTION_STATE_PAUSED     = "com.mudita.timer.STATE_PAUSED"
+        const val ACTION_TICK             = "com.jppelt.muditatimer.TICK"
+        const val ACTION_FINISHED         = "com.jppelt.muditatimer.FINISHED"
+        const val ACTION_STATE_PAUSED     = "com.jppelt.muditatimer.STATE_PAUSED"
 
         const val EXTRA_DURATION_MS       = "duration_ms"
         const val EXTRA_MODE              = "mode"
