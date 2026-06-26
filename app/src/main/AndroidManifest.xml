@@ -3,7 +3,9 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- USE_EXACT_ALARM is a normal permission required on API 33+ for exact alarms. -->
+    <!-- SCHEDULE_EXACT_ALARM: user-grantable exact-alarm permission (API 31+). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- USE_EXACT_ALARM: auto-granted to clock/timer apps on API 33+. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application

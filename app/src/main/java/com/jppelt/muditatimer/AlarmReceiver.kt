@@ -64,11 +64,16 @@ class AlarmReceiver : BroadcastReceiver() {
 
         fun schedule(context: Context, endTimeMs: Long) {
             val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            am.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                endTimeMs,
-                pendingIntent(context)
-            )
+            try {
+                val useExact = android.os.Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()
+                if (useExact) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTimeMs, pendingIntent(context))
+                } else {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTimeMs, pendingIntent(context))
+                }
+            } catch (e: SecurityException) {
+                android.util.Log.w("AlarmReceiver", "Exact alarm permission denied, skipping schedule: $e")
+            }
         }
 
         fun cancel(context: Context) {
