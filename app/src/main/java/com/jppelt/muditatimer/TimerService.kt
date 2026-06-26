@@ -5,8 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.media.AudioManager
-import android.media.ToneGenerator
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -33,7 +31,6 @@ class TimerService : Service() {
     // ── Android objects ──────────────────────────────────────────────────────
 
     private val handler   = Handler(Looper.getMainLooper())
-    private var toneGen: ToneGenerator? = null
     private lateinit var notificationManager: NotificationManager
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
@@ -58,6 +55,7 @@ class TimerService : Service() {
                 mode       = Mode.TIMER
                 endTimeMs  = System.currentTimeMillis() + durationMs
                 tickState  = TickState.RUNNING
+                AlarmReceiver.schedule(this, endTimeMs)
                 startForeground(NOTIF_ID, buildNotification(getString(R.string.notification_timer_running)))
                 scheduleTick()
             }
@@ -76,6 +74,7 @@ class TimerService : Service() {
                 if (mode == Mode.TIMER) {
                     pausedRemainingMs = endTimeMs - System.currentTimeMillis()
                     if (pausedRemainingMs < 0) pausedRemainingMs = 0
+                    AlarmReceiver.cancel(this)
                 } else {
                     pausedElapsedMs = System.currentTimeMillis() - startTimeMs
                 }
@@ -84,6 +83,7 @@ class TimerService : Service() {
                 if (tickState != TickState.PAUSED) return START_NOT_STICKY
                 if (mode == Mode.TIMER) {
                     endTimeMs = System.currentTimeMillis() + pausedRemainingMs
+                    AlarmReceiver.schedule(this, endTimeMs)
                 } else {
                     startTimeMs = System.currentTimeMillis() - pausedElapsedMs
                 }
@@ -92,12 +92,14 @@ class TimerService : Service() {
             }
             ACTION_RESET -> {
                 cancelTick()
+                AlarmReceiver.cancel(this)
                 tickState = TickState.IDLE
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
             ACTION_STOP -> {
                 cancelTick()
+                AlarmReceiver.cancel(this)
                 tickState = TickState.IDLE
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -112,7 +114,6 @@ class TimerService : Service() {
     override fun onDestroy() {
         cancelTick()
         handler.removeCallbacksAndMessages(null)
-        toneGen?.release()
         super.onDestroy()
     }
 
@@ -183,24 +184,13 @@ class TimerService : Service() {
 
     private fun onTimerFinished() {
         tickState = TickState.IDLE
+        // Cancel the AlarmManager alarm — it may have already fired (no-op) or
+        // may still be pending if the tick loop noticed zero first (rare).
+        // Sound is played by AlarmReceiver; the service only handles display/state.
+        AlarmReceiver.cancel(this)
         sendBroadcast(Intent(ACTION_FINISHED).apply { setPackage(packageName) })
-        playAlarm()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-    }
-
-    // ── Alarm ────────────────────────────────────────────────────────────────
-
-    private fun playAlarm() {
-        try {
-            toneGen?.release()
-            toneGen = ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)
-            toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP2, 2_000)
-            handler.postDelayed({
-                toneGen?.release()
-                toneGen = null
-            }, 2_500L)
-        } catch (_: Exception) {}
     }
 
     // ── Notification ─────────────────────────────────────────────────────────

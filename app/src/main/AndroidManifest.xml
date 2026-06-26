@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- USE_EXACT_ALARM is a normal permission required on API 33+ for exact alarms. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
         android:allowBackup="false"
@@ -25,6 +28,10 @@
         <service
             android:name=".TimerService"
             android:foregroundServiceType="dataSync" />
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:exported="false" />
 
     </application>
 </manifest>
