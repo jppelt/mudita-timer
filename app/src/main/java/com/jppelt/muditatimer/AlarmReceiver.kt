@@ -72,7 +72,14 @@ class AlarmReceiver : BroadcastReceiver() {
                     am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTimeMs, pendingIntent(context))
                 }
             } catch (e: SecurityException) {
-                android.util.Log.w("AlarmReceiver", "Exact alarm permission denied, skipping schedule: $e")
+                // Exact alarm refused at the OS level — fall back to an inexact
+                // alarm so the timer still fires, just without guaranteed precision.
+                android.util.Log.w("AlarmReceiver", "Exact alarm denied, falling back to inexact: $e")
+                try {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTimeMs, pendingIntent(context))
+                } catch (e2: Exception) {
+                    android.util.Log.w("AlarmReceiver", "Inexact alarm also failed, no alarm scheduled: $e2")
+                }
             }
         }
 
