@@ -12,7 +12,7 @@ A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/product
 - **Stopwatch** — MM:SS display, pause and resume, reset to zero
 - **Runs in the background** — a foreground service keeps the timer accurate when the screen is off or the app is backgrounded
 - **Pause and resume** — picks up exactly where you left off
-- **Audible alarm** — a single clean tone when the timer ends, nothing more
+- **Audible alarm** — plays a tone when the timer ends
 - **No distractions** — no notifications beyond the required foreground service notice, no history, no settings, no accounts
 - **Fully offline** — no network calls, no analytics, no permissions beyond what is necessary
 
@@ -36,7 +36,7 @@ The Kompakt does not have an app store. Apps are installed via [Mudita Center](h
 3. Open Mudita Center and wait for the device to appear
 4. Navigate to **Manage Files → App Installers → Add App Files**
 5. Select the downloaded APK and confirm
-6. The app appears in your Kompakt's app list as **Mudita Timer**
+6. The app appears in your Kompakt's app list as **Timer**
 
 ---
 
@@ -53,7 +53,6 @@ The Kompakt does not have an app store. Apps are installed via [Mudita Center](h
 ```bash
 git clone https://github.com/jppelt/mudita-timer.git
 cd mudita-timer
-git checkout claude/eink-countdown-timer-app-cG5Mx
 
 # Download the Gradle wrapper and Android SDK (Fedora / Ubuntu)
 chmod +x bootstrap.sh
@@ -101,7 +100,7 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 
 ## Technical notes
 
-- Version: 1.3.1
+- Version: 1.3.4
 - Language: Kotlin
 - Minimum SDK: 28 (Android 9)
 - Target SDK: 31 (Android 12 — matches MuditaOS K)
