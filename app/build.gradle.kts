@@ -20,7 +20,7 @@ android {
         applicationId = "com.jppelt.muditatimer"
         minSdk = 28
         targetSdk = 31
-        versionCode = 3
+        versionCode = 4
         versionName = "1.3.1"
     }
 
