@@ -106,3 +106,7 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 - Target SDK: 31 (Android 12 — matches MuditaOS K)
 - No external dependencies beyond the Android framework
 - No `INTERNET` permission
+
+## Known issues
+
+See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current limitations and known behavior.
