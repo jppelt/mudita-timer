@@ -90,7 +90,7 @@ The APK is written to `app/build/outputs/apk/`.
 
 Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/community/blog/introducing-mudita-mindful-design/) principles:
 
-**Readability** — Large monospace digits, pure black on white, no grays. Every element is legible on an E Ink display without squinting.
+**Readability** — Large digits, pure black on white, no grays. Every element is legible on an E Ink display without squinting.
 
 **Simplicity** — One screen per task. No menus, no history, no configuration beyond what the timer actually needs.
 
