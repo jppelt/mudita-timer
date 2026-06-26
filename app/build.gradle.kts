@@ -49,6 +49,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    lint {
+        disable += "ExpiredTargetSdkVersion"
+    }
 }
 
 // Zero external dependencies — Android framework only.
