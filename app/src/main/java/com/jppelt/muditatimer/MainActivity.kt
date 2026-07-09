@@ -191,8 +191,12 @@ class MainActivity : Activity() {
         // Start button
         findViewById<Button>(R.id.btnStart).setOnClickListener {
             if (mode == Mode.TIMER) {
+                // Validate the settled value once: reject an out-of-range seconds
+                // field (e.g. "90" → 00:90) and 00:00, treating both as no-ops.
+                val padded = customEntry.padStart(4, '0')
+                val ss = padded.substring(2, 4).toInt()
                 val ms = currentCustomMs()
-                if (ms > 0) startTimer(ms)
+                if (ss <= 59 && ms > 0) startTimer(ms)
             } else {
                 startStopwatch()
             }
@@ -326,13 +330,10 @@ class MainActivity : Activity() {
     private fun onDigit(d: Int) {
         // Ignore leading zeros so the four digit slots are not wasted.
         if (customEntry.isEmpty() && d == 0) return
-        if (customEntry.length >= 4) return
-        val candidate = customEntry + d
-        val padded = candidate.padStart(4, '0')
-        val mm = padded.substring(0, 2).toInt()
-        val ss = padded.substring(2, 4).toInt()
-        if (mm > 99 || ss > 59) return   // would exceed 99:59 — ignore
-        customEntry = candidate
+        if (customEntry.length >= 4) return   // 4-digit cap already bounds minutes at 99
+        // No intermediate mm/ss validation: digits fill from the right, so a buffer
+        // like "90" (00:90) is a legitimate in-progress state on the way to 9:00.
+        customEntry += d
         updateCustomDisplay()
     }
 
