@@ -136,113 +136,207 @@
                 android:background="@color/black" />
         </LinearLayout>
 
-        <!-- Custom minute/second pickers (hidden in stopwatch mode) -->
+        <!-- Custom duration numpad (hidden in stopwatch mode) -->
         <LinearLayout
             android:id="@+id/customPickerLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginBottom="28dp">
+            android:layout_marginBottom="24dp">
 
-            <!-- Minutes row -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <Button
-                    android:id="@+id/btnMinus"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/btn_filled"
-                    android:stateListAnimator="@null"
-                    android:text="@string/minus"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textAllCaps="false" />
-
-                <TextView
-                    android:id="@+id/tvCustomMin"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="25"
-                    android:textColor="@color/black"
-                    android:textSize="56sp"
-                    android:fontFamily="monospace"
-                    android:gravity="center" />
-
-                <Button
-                    android:id="@+id/btnPlus"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/btn_filled"
-                    android:stateListAnimator="@null"
-                    android:text="@string/plus"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textAllCaps="false" />
-            </LinearLayout>
-
+            <!-- MM:SS display -->
             <TextView
+                android:id="@+id/tvCustomDisplay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/min"
+                android:text="00:00"
                 android:textColor="@color/black"
-                android:textSize="13sp"
+                android:textSize="64sp"
+                android:fontFamily="monospace"
                 android:gravity="center"
-                android:layout_marginTop="2dp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Seconds row -->
+            <!-- Row 1: 1 2 3 -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:weightSum="3"
+                android:layout_marginBottom="8dp">
 
                 <Button
-                    android:id="@+id/btnMinusSec"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/btn_filled"
+                    android:id="@+id/btnNum1"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="@string/minus"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:text="1"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
                     android:textAllCaps="false" />
 
-                <TextView
-                    android:id="@+id/tvCustomSec"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="00"
+                <Button
+                    android:id="@+id/btnNum2"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="2"
                     android:textColor="@color/black"
-                    android:textSize="56sp"
-                    android:fontFamily="monospace"
-                    android:gravity="center" />
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
 
                 <Button
-                    android:id="@+id/btnPlusSec"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/btn_filled"
+                    android:id="@+id/btnNum3"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="@string/plus"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:text="3"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
                     android:textAllCaps="false" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Row 2: 4 5 6 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sec"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:gravity="center"
-                android:layout_marginTop="2dp" />
+                android:orientation="horizontal"
+                android:weightSum="3"
+                android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnNum4"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="4"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnNum5"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="5"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnNum6"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="6"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <!-- Row 3: 7 8 9 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3"
+                android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnNum7"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="7"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnNum8"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="8"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnNum9"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="9"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <!-- Row 4: backspace 0 spacer -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <Button
+                    android:id="@+id/btnBackspace"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="⌫"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnNum0"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textAllCaps="false" />
+
+                <!-- Spacer to balance the row -->
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
         </LinearLayout>
 

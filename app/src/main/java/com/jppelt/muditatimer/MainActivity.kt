@@ -24,8 +24,8 @@ class MainActivity : Activity() {
     private var remainingMs = DEFAULT_DURATION_MS
     private var elapsedMs   = 0L
 
-    private var customMinutes = DEFAULT_CUSTOM_MIN
-    private var customSeconds = 0
+    // Numpad entry: up to 4 digits, filled from the right. Padded to "MMSS".
+    private var customEntry = ""
 
     // ── Views ────────────────────────────────────────────────────────────────
 
@@ -35,8 +35,7 @@ class MainActivity : Activity() {
     private lateinit var viewStopwatch:         View
     private lateinit var btnModeTimer:          Button
     private lateinit var btnModeStopwatch:      Button
-    private lateinit var tvCustomMin:           TextView
-    private lateinit var tvCustomSec:           TextView
+    private lateinit var tvCustomDisplay:       TextView
     private lateinit var tvCountdown:           TextView
     private lateinit var btnPauseResume:        Button
     private lateinit var tvStopwatch:           TextView
@@ -132,8 +131,7 @@ class MainActivity : Activity() {
         out.putLong(KEY_DURATION,  durationMs)
         out.putLong(KEY_REMAINING, remainingMs)
         out.putLong(KEY_ELAPSED,   elapsedMs)
-        out.putInt(KEY_CUSTOM_MIN, customMinutes)
-        out.putInt(KEY_CUSTOM_SEC, customSeconds)
+        out.putString(KEY_CUSTOM_ENTRY, customEntry)
     }
 
     // ── Setup ────────────────────────────────────────────────────────────────
@@ -145,8 +143,7 @@ class MainActivity : Activity() {
         viewStopwatch         = findViewById(R.id.viewStopwatch)
         btnModeTimer          = findViewById(R.id.btnModeTimer)
         btnModeStopwatch      = findViewById(R.id.btnModeStopwatch)
-        tvCustomMin           = findViewById(R.id.tvCustomMin)
-        tvCustomSec           = findViewById(R.id.tvCustomSec)
+        tvCustomDisplay       = findViewById(R.id.tvCustomDisplay)
         tvCountdown           = findViewById(R.id.tvCountdown)
         btnPauseResume        = findViewById(R.id.btnPauseResume)
         tvStopwatch           = findViewById(R.id.tvStopwatch)
@@ -160,15 +157,13 @@ class MainActivity : Activity() {
 
     private fun restoreState(bundle: Bundle?) {
         if (bundle != null) {
-            state         = State.entries[bundle.getInt(KEY_STATE, State.SETUP.ordinal)]
-            durationMs    = bundle.getLong(KEY_DURATION,  DEFAULT_DURATION_MS)
-            remainingMs   = bundle.getLong(KEY_REMAINING, DEFAULT_DURATION_MS)
-            elapsedMs     = bundle.getLong(KEY_ELAPSED,   0L)
-            customMinutes = bundle.getInt(KEY_CUSTOM_MIN, DEFAULT_CUSTOM_MIN)
-            customSeconds = bundle.getInt(KEY_CUSTOM_SEC, 0)
+            state       = State.entries[bundle.getInt(KEY_STATE, State.SETUP.ordinal)]
+            durationMs  = bundle.getLong(KEY_DURATION,  DEFAULT_DURATION_MS)
+            remainingMs = bundle.getLong(KEY_REMAINING, DEFAULT_DURATION_MS)
+            elapsedMs   = bundle.getLong(KEY_ELAPSED,   0L)
+            customEntry = bundle.getString(KEY_CUSTOM_ENTRY, "")
         }
-        tvCustomMin.text = "%02d".format(customMinutes)
-        tvCustomSec.text = "%02d".format(customSeconds)
+        updateCustomDisplay()
         tvCountdown.text = formatRemaining(remainingMs)
         tvStopwatch.text = formatElapsed(elapsedMs)
     }
@@ -183,26 +178,20 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.btn10min).setOnClickListener  { startTimer(10 * 60_000L) }
         findViewById<Button>(R.id.btn25min).setOnClickListener  { startTimer(25 * 60_000L) }
 
-        // Custom picker — minutes
-        findViewById<Button>(R.id.btnMinus).setOnClickListener {
-            if (customMinutes > 0) { customMinutes--; tvCustomMin.text = "%02d".format(customMinutes) }
+        // Custom numpad — digits 0-9
+        val digitIds = intArrayOf(
+            R.id.btnNum0, R.id.btnNum1, R.id.btnNum2, R.id.btnNum3, R.id.btnNum4,
+            R.id.btnNum5, R.id.btnNum6, R.id.btnNum7, R.id.btnNum8, R.id.btnNum9
+        )
+        for (d in 0..9) {
+            findViewById<Button>(digitIds[d]).setOnClickListener { onDigit(d) }
         }
-        findViewById<Button>(R.id.btnPlus).setOnClickListener {
-            if (customMinutes < 99) { customMinutes++; tvCustomMin.text = "%02d".format(customMinutes) }
-        }
-
-        // Custom picker — seconds
-        findViewById<Button>(R.id.btnMinusSec).setOnClickListener {
-            if (customSeconds > 0) { customSeconds--; tvCustomSec.text = "%02d".format(customSeconds) }
-        }
-        findViewById<Button>(R.id.btnPlusSec).setOnClickListener {
-            if (customSeconds < 59) { customSeconds++; tvCustomSec.text = "%02d".format(customSeconds) }
-        }
+        findViewById<Button>(R.id.btnBackspace).setOnClickListener { onBackspace() }
 
         // Start button
         findViewById<Button>(R.id.btnStart).setOnClickListener {
             if (mode == Mode.TIMER) {
-                val ms = (customMinutes * 60 + customSeconds) * 1_000L
+                val ms = currentCustomMs()
                 if (ms > 0) startTimer(ms)
             } else {
                 startStopwatch()
@@ -332,6 +321,41 @@ class MainActivity : Activity() {
                else          "%02d:%02d:%02d".format(s / 3600, (s % 3600) / 60, s % 60)
     }
 
+    // ── Custom numpad ────────────────────────────────────────────────────────
+
+    private fun onDigit(d: Int) {
+        // Ignore leading zeros so the four digit slots are not wasted.
+        if (customEntry.isEmpty() && d == 0) return
+        if (customEntry.length >= 4) return
+        val candidate = customEntry + d
+        val padded = candidate.padStart(4, '0')
+        val mm = padded.substring(0, 2).toInt()
+        val ss = padded.substring(2, 4).toInt()
+        if (mm > 99 || ss > 59) return   // would exceed 99:59 — ignore
+        customEntry = candidate
+        updateCustomDisplay()
+    }
+
+    private fun onBackspace() {
+        if (customEntry.isNotEmpty()) {
+            customEntry = customEntry.dropLast(1)
+            updateCustomDisplay()
+        }
+    }
+
+    private fun updateCustomDisplay() {
+        val padded = customEntry.padStart(4, '0')
+        tvCustomDisplay.text = "${padded.substring(0, 2)}:${padded.substring(2, 4)}"
+    }
+
+    /** Total milliseconds from the current numpad entry (rightmost two = seconds). */
+    private fun currentCustomMs(): Long {
+        val padded = customEntry.padStart(4, '0')
+        val mm = padded.substring(0, 2).toInt()
+        val ss = padded.substring(2, 4).toInt()
+        return (mm * 60 + ss) * 1_000L
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private fun prefs() = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
@@ -340,7 +364,6 @@ class MainActivity : Activity() {
 
     companion object {
         private const val DEFAULT_DURATION_MS = 25 * 60 * 1_000L
-        private const val DEFAULT_CUSTOM_MIN  = 25
 
         private const val PREFS_NAME          = "mudita_prefs"
         private const val PREF_LAST_MODE      = "last_mode"
@@ -350,7 +373,6 @@ class MainActivity : Activity() {
         private const val KEY_DURATION        = "duration"
         private const val KEY_REMAINING       = "remaining"
         private const val KEY_ELAPSED         = "elapsed"
-        private const val KEY_CUSTOM_MIN      = "custom_min"
-        private const val KEY_CUSTOM_SEC      = "custom_sec"
+        private const val KEY_CUSTOM_ENTRY    = "custom_entry"
     }
 }
