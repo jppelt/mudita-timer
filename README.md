@@ -8,7 +8,7 @@ A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/product
 
 - **Two modes** — countdown timer and stopwatch, switchable from the setup screen
 - **Three presets** — 5, 10, and 25 minutes, one tap to start
-- **Custom duration** — set minutes (0–99) and seconds (0–59) via simple +/− pickers
+- **Custom duration** — type any time on an on-screen numpad (up to 99:59), the way a stock phone timer works
 - **Stopwatch** — MM:SS display, pause and resume, reset to zero
 - **Runs in the background** — a foreground service keeps the timer accurate when the screen is off or the app is backgrounded
 - **Pause and resume** — picks up exactly where you left off
@@ -100,7 +100,7 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 
 ## Technical notes
 
-- Version: 1.4.1
+- Version: 1.5.2
 - Language: Kotlin
 - Minimum SDK: 28 (Android 9)
 - Target SDK: 31 (Android 12 — matches MuditaOS K)

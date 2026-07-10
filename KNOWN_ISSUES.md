@@ -1,6 +1,6 @@
 # Known Issues and Limitations
 
-This is an honest list of current limitations in Mudita Timer (v1.4.1). It is a
+This is an honest list of current limitations in Mudita Timer (v1.5.2). It is a
 small, single-purpose app built and tested specifically for the Mudita Kompakt.
 Nothing here prevents normal use; these are documented so expectations are clear.
 
@@ -56,8 +56,21 @@ Nothing here prevents normal use; these are documented so expectations are clear
   system icon rather than the app's hourglass. Cosmetic only.
 - **The persistent notification cannot be dismissed while running.** This is
   required by Android for a foreground service and is expected behavior, not a bug.
-- **Custom durations are bounded.** The custom timer accepts 0 to 99 minutes and
-  0 to 59 seconds.
+- **Custom durations are bounded.** Custom times are entered on an on-screen
+  numpad (digits fill from the right, like a stock phone timer) and accept 0 to
+  99 minutes and 0 to 59 seconds. An out-of-range entry (for example a stray
+  `00:90`) is simply ignored when Start is tapped rather than showing an error.
+
+## Not yet implemented
+
+These are reasonable requests that are not in the app yet, noted here so the scope
+is clear:
+
+- **Presets are fixed.** The one-tap presets are 5, 10, and 25 minutes and cannot
+  currently be changed or added to. Custom times of any length can still be entered
+  on the numpad.
+- **A running timer cannot be extended.** There is no "add a minute" control once a
+  countdown is running; to change the time, reset and start again.
 
 ## Maintenance notes (for anyone building from source)
 
