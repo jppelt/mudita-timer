@@ -6,354 +6,362 @@
     android:background="@color/white">
 
     <!-- ── SETUP ─────────────────────────────────────────────────────────── -->
-    <LinearLayout
+    <!-- ScrollView is a safety net so nothing is ever permanently off-screen on
+         short displays. fillViewport keeps the stopwatch weight-spacer working. -->
+    <ScrollView
         android:id="@+id/viewSetup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="top|center_horizontal"
-        android:padding="24dp"
-        android:paddingTop="32dp">
+        android:fillViewport="true">
 
-        <!-- Mode toggle: Timer | Stopwatch -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="48dp">
-
-            <Button
-                android:id="@+id/btnModeTimer"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/btn_filled"
-                android:stateListAnimator="@null"
-                android:text="@string/mode_timer"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btnModeStopwatch"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_outline"
-                android:stateListAnimator="@null"
-                android:text="@string/mode_stopwatch"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
-        <!-- Flexible spacer: visible in stopwatch mode to push Start toward center -->
-        <View
-            android:id="@+id/stopwatchSpacer"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:visibility="gone" />
-
-        <!-- Preset buttons (hidden in stopwatch mode) -->
-        <LinearLayout
-            android:id="@+id/presetButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-            <Button
-                android:id="@+id/btn5min"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/btn_outline"
-                android:stateListAnimator="@null"
-                android:text="@string/preset_5"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn10min"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/btn_outline"
-                android:stateListAnimator="@null"
-                android:text="@string/preset_10"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn25min"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_outline"
-                android:stateListAnimator="@null"
-                android:text="@string/preset_25"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
-        <!-- "or" divider (hidden in stopwatch mode) -->
-        <LinearLayout
-            android:id="@+id/dividerOr"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="20dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/or"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="@color/black" />
-        </LinearLayout>
-
-        <!-- Custom duration numpad (hidden in stopwatch mode) -->
-        <LinearLayout
-            android:id="@+id/customPickerLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginBottom="24dp">
+            android:gravity="top|center_horizontal"
+            android:padding="16dp"
+            android:paddingTop="16dp">
 
-            <!-- MM:SS display -->
-            <TextView
-                android:id="@+id/tvCustomDisplay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textColor="@color/black"
-                android:textSize="64sp"
-                android:fontFamily="monospace"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Row 1: 1 2 3 -->
+            <!-- Mode toggle: Timer | Stopwatch -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="3"
-                android:layout_marginBottom="8dp">
+                android:weightSum="2"
+                android:layout_marginBottom="16dp">
 
                 <Button
-                    android:id="@+id/btnNum1"
+                    android:id="@+id/btnModeTimer"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="44dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/btn_filled"
                     android:stateListAnimator="@null"
-                    android:text="1"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:text="@string/mode_timer"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
                     android:textAllCaps="false" />
 
                 <Button
-                    android:id="@+id/btnNum2"
+                    android:id="@+id/btnModeStopwatch"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="2"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btnNum3"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="44dp"
                     android:layout_weight="1"
                     android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="3"
+                    android:text="@string/mode_stopwatch"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="15sp"
                     android:textAllCaps="false" />
             </LinearLayout>
 
-            <!-- Row 2: 4 5 6 -->
-            <LinearLayout
+            <!-- Flexible spacer: visible in stopwatch mode to push Start toward center -->
+            <View
+                android:id="@+id/stopwatchSpacer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3"
-                android:layout_marginBottom="8dp">
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
 
-                <Button
-                    android:id="@+id/btnNum4"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="4"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btnNum5"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="5"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btnNum6"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="6"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-            </LinearLayout>
-
-            <!-- Row 3: 7 8 9 -->
+            <!-- Preset buttons (hidden in stopwatch mode) -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3"
-                android:layout_marginBottom="8dp">
-
-                <Button
-                    android:id="@+id/btnNum7"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="7"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btnNum8"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="8"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btnNum9"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/btn_outline"
-                    android:stateListAnimator="@null"
-                    android:text="9"
-                    android:textColor="@color/black"
-                    android:textSize="22sp"
-                    android:textAllCaps="false" />
-            </LinearLayout>
-
-            <!-- Row 4: backspace 0 spacer -->
-            <LinearLayout
+                android:id="@+id/presetButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:weightSum="3">
 
                 <Button
-                    android:id="@+id/btnBackspace"
+                    android:id="@+id/btn5min"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="⌫"
+                    android:text="@string/preset_5"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="16sp"
                     android:textAllCaps="false" />
 
                 <Button
-                    android:id="@+id/btnNum0"
+                    android:id="@+id/btn10min"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="0"
+                    android:text="@string/preset_10"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="16sp"
                     android:textAllCaps="false" />
 
-                <!-- Spacer to balance the row -->
-                <Space
+                <Button
+                    android:id="@+id/btn25min"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1" />
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="@string/preset_25"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
             </LinearLayout>
 
+            <!-- "or" divider (hidden in stopwatch mode) -->
+            <LinearLayout
+                android:id="@+id/dividerOr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/black" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/or"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/black" />
+            </LinearLayout>
+
+            <!-- Custom duration numpad (hidden in stopwatch mode) -->
+            <LinearLayout
+                android:id="@+id/customPickerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="12dp">
+
+                <!-- MM:SS display -->
+                <TextView
+                    android:id="@+id/tvCustomDisplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textColor="@color/black"
+                    android:textSize="44sp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Row 1: 1 2 3 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginBottom="6dp">
+
+                    <Button
+                        android:id="@+id/btnNum1"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="1"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum2"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="2"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum3"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="3"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+                </LinearLayout>
+
+                <!-- Row 2: 4 5 6 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginBottom="6dp">
+
+                    <Button
+                        android:id="@+id/btnNum4"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="4"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum5"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="5"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum6"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="6"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+                </LinearLayout>
+
+                <!-- Row 3: 7 8 9 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginBottom="6dp">
+
+                    <Button
+                        android:id="@+id/btnNum7"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="7"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum8"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="8"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum9"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="9"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+                </LinearLayout>
+
+                <!-- Row 4: backspace 0 spacer -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <Button
+                        android:id="@+id/btnBackspace"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="⌫"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btnNum0"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/btn_outline"
+                        android:stateListAnimator="@null"
+                        android:text="0"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textAllCaps="false" />
+
+                    <!-- Spacer to balance the row -->
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Start button: starts timer (timer mode) or stopwatch (stopwatch mode) -->
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/btn_filled"
+                android:stateListAnimator="@null"
+                android:text="@string/start"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textAllCaps="false"
+                android:textStyle="bold" />
+
         </LinearLayout>
-
-        <!-- Start button: starts timer (timer mode) or stopwatch (stopwatch mode) -->
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@drawable/btn_filled"
-            android:stateListAnimator="@null"
-            android:text="@string/start"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textAllCaps="false"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+    </ScrollView>
 
     <!-- ── TIMER ─────────────────────────────────────────────────────────── -->
     <LinearLayout
