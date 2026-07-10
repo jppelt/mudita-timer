@@ -20,10 +20,8 @@ A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/product
 
 ## Screenshots
 
-![Timer Setup](screenshots/Timer%20Setup.png)
-![Timer Running](screenshots/Time%20Running.png)
-![Stopwatch](screenshots/Stopwatch.png)
-![Stopwatch Running](screenshots/Stopwatch%20Running.png)
+![Timer](screenshots/timer.png)
+![Stopwatch](screenshots/stopwatch.png)
 
 ---
 
