@@ -24,7 +24,7 @@ class MainActivity : Activity() {
     private var remainingMs = DEFAULT_DURATION_MS
     private var elapsedMs   = 0L
 
-    // Numpad entry: up to 4 digits, filled from the right. Padded to "MMSS".
+    // Numpad entry: up to 6 digits, filled from the right. Padded to "HHMMSS".
     private var customEntry = ""
 
     // ── Views ────────────────────────────────────────────────────────────────
@@ -191,12 +191,10 @@ class MainActivity : Activity() {
         // Start button
         findViewById<Button>(R.id.btnStart).setOnClickListener {
             if (mode == Mode.TIMER) {
-                // Validate the settled value once: reject an out-of-range seconds
-                // field (e.g. "90" → 00:90) and 00:00, treating both as no-ops.
-                val padded = customEntry.padStart(4, '0')
-                val ss = padded.substring(2, 4).toInt()
+                // Treat the six digits as a raw HHMMSS value; seconds and minutes
+                // carry on start (e.g. 00:61:00 → 01:01:00, 00:00:61 → 00:01:01).
                 val ms = currentCustomMs()
-                if (ss <= 59 && ms > 0) startTimer(ms)
+                if (ms > 0) startTimer(ms)
             } else {
                 startStopwatch()
             }
@@ -316,7 +314,7 @@ class MainActivity : Activity() {
 
     private fun formatRemaining(ms: Long): String {
         val totalSec = (ms + 500L) / 1_000L
-        return "%02d:%02d".format(totalSec / 60, totalSec % 60)
+        return "%02d:%02d:%02d".format(totalSec / 3600, (totalSec % 3600) / 60, totalSec % 60)
     }
 
     private fun formatElapsed(ms: Long): String {
@@ -328,11 +326,11 @@ class MainActivity : Activity() {
     // ── Custom numpad ────────────────────────────────────────────────────────
 
     private fun onDigit(d: Int) {
-        // Ignore leading zeros so the four digit slots are not wasted.
+        // Ignore leading zeros so the six digit slots are not wasted.
         if (customEntry.isEmpty() && d == 0) return
-        if (customEntry.length >= 4) return   // 4-digit cap already bounds minutes at 99
-        // No intermediate mm/ss validation: digits fill from the right, so a buffer
-        // like "90" (00:90) is a legitimate in-progress state on the way to 9:00.
+        if (customEntry.length >= CUSTOM_ENTRY_DIGITS) return
+        // No intermediate validation: digits fill from the right, so a buffer
+        // like "90" (00:00:90) is a legitimate in-progress state on the way to 9:00.
         customEntry += d
         updateCustomDisplay()
     }
@@ -345,16 +343,17 @@ class MainActivity : Activity() {
     }
 
     private fun updateCustomDisplay() {
-        val padded = customEntry.padStart(4, '0')
-        tvCustomDisplay.text = "${padded.substring(0, 2)}:${padded.substring(2, 4)}"
+        val padded = customEntry.padStart(CUSTOM_ENTRY_DIGITS, '0')
+        tvCustomDisplay.text = "${padded.substring(0, 2)}:${padded.substring(2, 4)}:${padded.substring(4, 6)}"
     }
 
     /** Total milliseconds from the current numpad entry (rightmost two = seconds). */
     private fun currentCustomMs(): Long {
-        val padded = customEntry.padStart(4, '0')
-        val mm = padded.substring(0, 2).toInt()
-        val ss = padded.substring(2, 4).toInt()
-        return (mm * 60 + ss) * 1_000L
+        val padded = customEntry.padStart(CUSTOM_ENTRY_DIGITS, '0')
+        val hh = padded.substring(0, 2).toInt()
+        val mm = padded.substring(2, 4).toInt()
+        val ss = padded.substring(4, 6).toInt()
+        return (hh * 3600L + mm * 60L + ss) * 1_000L
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -364,6 +363,7 @@ class MainActivity : Activity() {
     // ── Constants ────────────────────────────────────────────────────────────
 
     companion object {
+        private const val CUSTOM_ENTRY_DIGITS = 6
         private const val DEFAULT_DURATION_MS = 25 * 60 * 1_000L
 
         private const val PREFS_NAME          = "mudita_prefs"

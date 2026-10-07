@@ -152,14 +152,14 @@
                 android:gravity="center"
                 android:layout_marginBottom="12dp">
 
-                <!-- MM:SS display -->
+                <!-- HH:MM:SS display -->
                 <TextView
                     android:id="@+id/tvCustomDisplay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
+                    android:text="00:00:00"
                     android:textColor="@color/black"
-                    android:textSize="44sp"
+                    android:textSize="36sp"
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:layout_marginBottom="8dp" />
@@ -375,11 +375,17 @@
 
         <TextView
             android:id="@+id/tvCountdown"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="25:00"
+            android:text="00:25:00"
             android:textColor="@color/black"
-            android:textSize="96sp"
+            android:textSize="56sp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="32sp"
+            android:autoSizeMaxTextSize="56sp"
+            android:autoSizeStepGranularity="1sp"
+            android:maxLines="1"
+            android:gravity="center"
             android:fontFamily="monospace"
             android:layout_marginBottom="48dp" />
 
