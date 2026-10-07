@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -28,6 +30,10 @@ class TimerService : Service() {
     private var startTimeMs         = 0L
     private var pausedElapsedMs     = 0L
 
+    // Continuous alarm ring
+    private var ringing = false
+    private var toneGen: ToneGenerator? = null
+
     // ── Android objects ──────────────────────────────────────────────────────
 
     private val handler   = Handler(Looper.getMainLooper())
@@ -50,6 +56,7 @@ class TimerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START_TIMER -> {
+                stopRing()
                 durationMs = intent.getLongExtra(EXTRA_DURATION_MS, 0L)
                 if (durationMs <= 0) return START_NOT_STICKY
                 mode       = Mode.TIMER
@@ -60,6 +67,7 @@ class TimerService : Service() {
                 scheduleTick()
             }
             ACTION_START_STOPWATCH -> {
+                stopRing()
                 mode        = Mode.STOPWATCH
                 startTimeMs = System.currentTimeMillis()
                 pausedElapsedMs = 0L
@@ -93,6 +101,7 @@ class TimerService : Service() {
             ACTION_RESET -> {
                 cancelTick()
                 AlarmReceiver.cancel(this)
+                stopRing()
                 tickState = TickState.IDLE
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -100,7 +109,24 @@ class TimerService : Service() {
             ACTION_STOP -> {
                 cancelTick()
                 AlarmReceiver.cancel(this)
+                stopRing()
                 tickState = TickState.IDLE
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
+            ACTION_RING -> {
+                // Alarm already fired — stop the countdown so a late tick cannot
+                // re-enter onTimerFinished and restart the ring after dismiss.
+                cancelTick()
+                AlarmReceiver.cancel(this)
+                tickState = TickState.IDLE
+                startRing()
+            }
+            ACTION_STOP_ALARM -> {
+                cancelTick()
+                AlarmReceiver.cancel(this)
+                tickState = TickState.IDLE
+                stopRing()
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -113,6 +139,7 @@ class TimerService : Service() {
 
     override fun onDestroy() {
         cancelTick()
+        stopRing()
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -186,11 +213,55 @@ class TimerService : Service() {
         tickState = TickState.IDLE
         // Cancel the AlarmManager alarm — it may have already fired (no-op) or
         // may still be pending if the tick loop noticed zero first (rare).
-        // Sound is played by AlarmReceiver; the service only handles display/state.
         AlarmReceiver.cancel(this)
         sendBroadcast(Intent(ACTION_FINISHED).apply { setPackage(packageName) })
+
+        // If continuous ring is selected and the alarm has not already handed off
+        // to ACTION_RING, start ringing here so a tick-first finish still sounds.
+        if (AlarmReceiver.isContinuous(this)) {
+            startRing()
+            return
+        }
+
+        // Short ring is played by AlarmReceiver; service only handles display/state.
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    // ── Continuous ring ──────────────────────────────────────────────────────
+
+    private val ringRunnable = object : Runnable {
+        override fun run() {
+            if (!ringing) return
+            toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP2, RING_BURST_ON_MS.toInt())
+            handler.postDelayed(this, RING_BURST_ON_MS + RING_BURST_GAP_MS)
+        }
+    }
+
+    private fun startRing() {
+        if (ringing) return
+        ringing = true
+        try {
+            toneGen = ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)
+        } catch (_: Exception) {
+            ringing = false
+            return
+        }
+        startForeground(NOTIF_ID, buildNotification(getString(R.string.notification_alarm_ringing)))
+        handler.post(ringRunnable)
+    }
+
+    private fun stopRing() {
+        if (!ringing && toneGen == null) return
+        ringing = false
+        handler.removeCallbacks(ringRunnable)
+        try {
+            toneGen?.stopTone()
+            toneGen?.release()
+        } catch (_: Exception) {
+            // Already released.
+        }
+        toneGen = null
     }
 
     // ── Notification ─────────────────────────────────────────────────────────
@@ -212,6 +283,8 @@ class TimerService : Service() {
         const val ACTION_RESUME           = "com.jppelt.muditatimer.RESUME"
         const val ACTION_RESET            = "com.jppelt.muditatimer.RESET"
         const val ACTION_STOP             = "com.jppelt.muditatimer.STOP"
+        const val ACTION_RING             = "com.jppelt.muditatimer.RING"
+        const val ACTION_STOP_ALARM       = "com.jppelt.muditatimer.STOP_ALARM"
         const val ACTION_REQUEST_STATE    = "com.jppelt.muditatimer.REQUEST_STATE"
 
         const val ACTION_TICK             = "com.jppelt.muditatimer.TICK"
@@ -225,5 +298,7 @@ class TimerService : Service() {
         private const val CHANNEL_ID      = "mudita_timer"
         private const val NOTIF_ID        = 1
         private const val TICK_MS         = 1_000L
+        private const val RING_BURST_ON_MS  = 900L
+        private const val RING_BURST_GAP_MS = 400L
     }
 }

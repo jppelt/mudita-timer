@@ -56,6 +56,41 @@
                     android:textAllCaps="false" />
             </LinearLayout>
 
+            <!-- Ring mode toggle: Short ring | Continuous (hidden in stopwatch mode) -->
+            <LinearLayout
+                android:id="@+id/ringModeToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnRingShort"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/btn_filled"
+                    android:stateListAnimator="@null"
+                    android:text="@string/ring_short"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnRingContinuous"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="@string/ring_continuous"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
             <!-- Flexible spacer: visible in stopwatch mode to push Start toward center -->
             <View
                 android:id="@+id/stopwatchSpacer"

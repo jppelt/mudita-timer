@@ -27,6 +27,11 @@
     <string name="mode_timer">Timer</string>
     <string name="mode_stopwatch">Stopwatch</string>
 
+    <!-- Ring mode toggle -->
+    <string name="ring_short">Short ring</string>
+    <string name="ring_continuous">Continuous</string>
+    <string name="notification_alarm_ringing">Alarm</string>
+
     <!-- Stopwatch screen -->
     <string name="stopwatch_start">Start</string>
     <string name="stopwatch_stop">Stop</string>

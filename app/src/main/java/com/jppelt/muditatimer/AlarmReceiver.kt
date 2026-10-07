@@ -18,6 +18,21 @@ class AlarmReceiver : BroadcastReceiver() {
         // sequence and delayed release complete before Android reclaims the receiver.
         val pendingResult = goAsync()
 
+        val continuous = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_RING_CONTINUOUS, false)
+
+        if (continuous) {
+            // Hand off to TimerService so the tone can keep looping until dismissed.
+            context.startService(Intent(context, TimerService::class.java).apply {
+                action = TimerService.ACTION_RING
+            })
+            context.sendBroadcast(Intent(TimerService.ACTION_FINISHED).apply {
+                setPackage(context.packageName)
+            })
+            pendingResult.finish()
+            return
+        }
+
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG)
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS)
@@ -53,6 +68,9 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
+        const val PREFS_NAME           = "mudita_prefs"
+        const val PREF_RING_CONTINUOUS = "ring_continuous"
+
         private const val BURST_COUNT          = 5
         private const val BURST_ON_MS          = 900L   // tone on per burst
         private const val BURST_GAP_MS         = 400L   // silence between bursts
@@ -87,6 +105,10 @@ class AlarmReceiver : BroadcastReceiver() {
             val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             am.cancel(pendingIntent(context))
         }
+
+        fun isContinuous(context: Context): Boolean =
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getBoolean(PREF_RING_CONTINUOUS, false)
 
         private fun pendingIntent(context: Context): PendingIntent =
             PendingIntent.getBroadcast(

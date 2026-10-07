@@ -35,11 +35,15 @@ class MainActivity : Activity() {
     private lateinit var viewStopwatch:         View
     private lateinit var btnModeTimer:          Button
     private lateinit var btnModeStopwatch:      Button
+    private lateinit var btnRingShort:          Button
+    private lateinit var btnRingContinuous:     Button
     private lateinit var tvCustomDisplay:       TextView
     private lateinit var tvCountdown:           TextView
     private lateinit var btnPauseResume:        Button
     private lateinit var tvStopwatch:           TextView
     private lateinit var btnStopwatchStartStop: Button
+
+    private var ringContinuous = false
 
     // ── BroadcastReceiver ────────────────────────────────────────────────────
 
@@ -87,6 +91,7 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
         bindViews()
         loadMode()
+        loadRingMode()
         restoreState(savedInstanceState)
         wireListeners()
         render()
@@ -143,6 +148,8 @@ class MainActivity : Activity() {
         viewStopwatch         = findViewById(R.id.viewStopwatch)
         btnModeTimer          = findViewById(R.id.btnModeTimer)
         btnModeStopwatch      = findViewById(R.id.btnModeStopwatch)
+        btnRingShort          = findViewById(R.id.btnRingShort)
+        btnRingContinuous     = findViewById(R.id.btnRingContinuous)
         tvCustomDisplay       = findViewById(R.id.tvCustomDisplay)
         tvCountdown           = findViewById(R.id.tvCountdown)
         btnPauseResume        = findViewById(R.id.btnPauseResume)
@@ -153,6 +160,10 @@ class MainActivity : Activity() {
     private fun loadMode() {
         val saved = prefs().getString(PREF_LAST_MODE, Mode.TIMER.name)
         mode = if (saved == Mode.STOPWATCH.name) Mode.STOPWATCH else Mode.TIMER
+    }
+
+    private fun loadRingMode() {
+        ringContinuous = prefs().getBoolean(AlarmReceiver.PREF_RING_CONTINUOUS, false)
     }
 
     private fun restoreState(bundle: Bundle?) {
@@ -172,6 +183,10 @@ class MainActivity : Activity() {
         // Mode toggle
         btnModeTimer.setOnClickListener     { setMode(Mode.TIMER) }
         btnModeStopwatch.setOnClickListener { setMode(Mode.STOPWATCH) }
+
+        // Ring mode toggle
+        btnRingShort.setOnClickListener      { setRingContinuous(false) }
+        btnRingContinuous.setOnClickListener { setRingContinuous(true) }
 
         // Preset timer buttons
         findViewById<Button>(R.id.btn5min).setOnClickListener   { startTimer(5 * 60_000L) }
@@ -210,9 +225,15 @@ class MainActivity : Activity() {
         }
         findViewById<Button>(R.id.btnReset).setOnClickListener { resetToSetup() }
 
-        // Done screen
-        findViewById<Button>(R.id.btnStartAgain).setOnClickListener { startTimer(durationMs) }
-        findViewById<Button>(R.id.btnBack).setOnClickListener       { resetToSetup() }
+        // Done screen — dismissing stops a continuous ring
+        findViewById<Button>(R.id.btnStartAgain).setOnClickListener {
+            stopAlarmSound()
+            startTimer(durationMs)
+        }
+        findViewById<Button>(R.id.btnBack).setOnClickListener {
+            stopAlarmSound()
+            resetToSetup()
+        }
 
         // Stopwatch controls
         btnStopwatchStartStop.setOnClickListener {
@@ -247,7 +268,18 @@ class MainActivity : Activity() {
         render()
     }
 
+    private fun setRingContinuous(continuous: Boolean) {
+        ringContinuous = continuous
+        prefs().edit().putBoolean(AlarmReceiver.PREF_RING_CONTINUOUS, continuous).apply()
+        render()
+    }
+
+    private fun stopAlarmSound() {
+        sendToService(TimerService.ACTION_STOP_ALARM)
+    }
+
     private fun startTimer(ms: Long) {
+        stopAlarmSound()
         durationMs       = ms
         remainingMs      = ms
         tvCountdown.text = formatRemaining(ms)
@@ -266,6 +298,7 @@ class MainActivity : Activity() {
     }
 
     private fun resetToSetup() {
+        stopAlarmSound()
         sendToService(TimerService.ACTION_RESET)
         prefs().edit().remove(PREF_END_TIME_MS).apply()
         state            = State.SETUP
@@ -298,7 +331,13 @@ class MainActivity : Activity() {
         btnModeStopwatch.setBackgroundResource(if (inStopwatch) R.drawable.btn_filled else R.drawable.btn_outline)
         btnModeStopwatch.setTextColor(getColor(if (inStopwatch) R.color.white else R.color.black))
 
+        btnRingShort.setBackgroundResource(if (ringContinuous) R.drawable.btn_outline else R.drawable.btn_filled)
+        btnRingShort.setTextColor(getColor(if (ringContinuous) R.color.black else R.color.white))
+        btnRingContinuous.setBackgroundResource(if (ringContinuous) R.drawable.btn_filled else R.drawable.btn_outline)
+        btnRingContinuous.setTextColor(getColor(if (ringContinuous) R.color.white else R.color.black))
+
         val timerOnlyVisibility = if (inStopwatch) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.ringModeToggle).visibility     = timerOnlyVisibility
         findViewById<View>(R.id.presetButtons).visibility      = timerOnlyVisibility
         findViewById<View>(R.id.dividerOr).visibility          = timerOnlyVisibility
         findViewById<View>(R.id.customPickerLayout).visibility = timerOnlyVisibility
@@ -366,7 +405,7 @@ class MainActivity : Activity() {
         private const val CUSTOM_ENTRY_DIGITS = 6
         private const val DEFAULT_DURATION_MS = 25 * 60 * 1_000L
 
-        private const val PREFS_NAME          = "mudita_prefs"
+        private const val PREFS_NAME          = AlarmReceiver.PREFS_NAME
         private const val PREF_LAST_MODE      = "last_mode"
         private const val PREF_END_TIME_MS    = "end_time_ms"
 
