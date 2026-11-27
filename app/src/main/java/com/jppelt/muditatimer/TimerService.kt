@@ -235,7 +235,7 @@ class TimerService : Service() {
         when {
             // Already ringing (the tick loop got to zero first): nothing to do.
             tickState == TickState.RINGING ->
-                startForeground(NOTIF_ID, buildRingNotification())
+                startForeground(RING_NOTIF_ID, buildRingNotification())
 
             // Normal case: the countdown this service is running has reached zero.
             tickState == TickState.RUNNING && mode == Mode.TIMER &&
@@ -288,7 +288,11 @@ class TimerService : Service() {
             acquire(MAX_RING_MS + 10_000L)
         }
 
-        startForeground(NOTIF_ID, buildRingNotification())
+        // Posted under its own ID, not as an update to the "Timer running"
+        // notification: the system only launches a full-screen intent for a newly
+        // posted notification, never for an update to one already showing.
+        // Switching IDs also removes the "Timer running" notification.
+        startForeground(RING_NOTIF_ID, buildRingNotification())
         alarmPlayer = AlarmPlayer(this).also { it.start() }
         handler.postDelayed(autoSilenceRunnable, MAX_RING_MS)
         broadcastFinished()
@@ -410,6 +414,7 @@ class TimerService : Service() {
         const val PREF_RINGING            = "ringing"
 
         const val MISSED_NOTIF_ID         = 2
+        private const val RING_NOTIF_ID   = 3
 
         /** Safety cap: an unanswered alarm goes quiet after this long. */
         private const val MAX_RING_MS     = 10 * 60 * 1_000L
