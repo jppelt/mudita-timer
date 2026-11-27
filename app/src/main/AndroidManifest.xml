@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- USE_EXACT_ALARM: auto-granted to clock/timer apps on API 33+. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- Lets the "time's up" notification turn the screen on and show the Stop
+         button over the lock screen. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:allowBackup="false"
@@ -19,6 +22,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing">
             <intent-filter>

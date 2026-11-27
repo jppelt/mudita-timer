@@ -436,6 +436,18 @@
             android:layout_marginBottom="48dp" />
 
         <Button
+            android:id="@+id/btnStopAlarm"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="@drawable/btn_filled"
+            android:stateListAnimator="@null"
+            android:text="@string/stop_alarm"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textAllCaps="false"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/btnStartAgain"
             android:layout_width="match_parent"
             android:layout_height="56dp"

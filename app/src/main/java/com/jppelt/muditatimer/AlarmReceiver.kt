@@ -5,59 +5,57 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.ToneGenerator
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.util.Log
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        // goAsync() keeps the process alive past onReceive() so the full burst
-        // sequence and delayed release complete before Android reclaims the receiver.
-        val pendingResult = goAsync()
-
+        // Bridge the gap between this broadcast returning and the service taking
+        // its own wakelock. Released automatically by the timeout.
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG)
-        wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS)
+        pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG).acquire(WAKE_LOCK_TIMEOUT_MS)
 
-        val handler = Handler(Looper.getMainLooper())
-
+        // Normal path: hand off to TimerService, which rings until the user stops it.
+        // The service is usually still running in the foreground from the countdown;
+        // if the process was killed, an exact alarm is allowed to start it again.
+        val ring = Intent(context, TimerService::class.java).setAction(TimerService.ACTION_ALARM_FIRED)
         try {
-            val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)
-
-            // 5 bursts: 900ms on, 400ms gap → 6 500ms total. Release 500ms after last burst.
-            for (i in 0 until BURST_COUNT) {
-                handler.postDelayed(
-                    { toneGen.startTone(ToneGenerator.TONE_PROP_BEEP2, BURST_ON_MS.toInt()) },
-                    i * (BURST_ON_MS + BURST_GAP_MS)
-                )
-            }
-
-            handler.postDelayed({
-                toneGen.release()
-                if (wakeLock.isHeld) wakeLock.release()
-                pendingResult.finish()
-            }, RELEASE_DELAY_MS)
-
-        } catch (_: Exception) {
-            if (wakeLock.isHeld) wakeLock.release()
-            pendingResult.finish()
+            context.startForegroundService(ring)
+            return
+        } catch (e: Exception) {
+            Log.w(TAG, "startForegroundService refused from alarm: $e")
+        }
+        // Refused (possible only under the inexact-alarm fallback). If the service is
+        // still alive in the foreground, a plain start reaches it.
+        try {
+            context.startService(ring)
+            return
+        } catch (e: Exception) {
+            Log.w(TAG, "startService refused from alarm, ringing briefly here instead: $e")
         }
 
-        // Notify the UI if it is currently visible.
+        // Last resort: no service can be started, so the process had been killed.
+        // Ring for the few seconds a receiver is allowed to stay alive, so the timer
+        // is never fully silent.
+        val pendingResult = goAsync()
+        val player = AlarmPlayer(context)
+        player.start()
+        Handler(Looper.getMainLooper()).postDelayed({
+            player.stop()
+            pendingResult.finish()
+        }, FALLBACK_RING_MS)
+
         context.sendBroadcast(Intent(TimerService.ACTION_FINISHED).apply {
             setPackage(context.packageName)
         })
     }
 
     companion object {
-        private const val BURST_COUNT          = 5
-        private const val BURST_ON_MS          = 900L   // tone on per burst
-        private const val BURST_GAP_MS         = 400L   // silence between bursts
-        // 5 × (900 + 400) = 6 500ms; 500ms buffer after the last burst
-        private const val RELEASE_DELAY_MS     = 7_000L
+        private const val TAG                  = "AlarmReceiver"
+        private const val FALLBACK_RING_MS     = 8_000L
         private const val WAKE_LOCK_TAG        = "muditatimer:alarm"
         private const val WAKE_LOCK_TIMEOUT_MS = 10_000L
         private const val REQUEST_CODE         = 1001

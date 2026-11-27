@@ -1,6 +1,6 @@
 # Known Issues and Limitations
 
-This is an honest list of current limitations in Mudita Timer (v1.5.2). It is a
+This is an honest list of current limitations in Mudita Timer (v1.6.0). It is a
 small, single-purpose app built and tested specifically for the Mudita Kompakt.
 Nothing here prevents normal use; these are documented so expectations are clear.
 
@@ -27,15 +27,17 @@ Nothing here prevents normal use; these are documented so expectations are clear
 - **On Android 13+ setups, an "Alarms & reminders" permission may matter.** If a
   device requires the user to grant exact-alarm permission and it is not granted,
   timing uses the inexact fallback described above.
-- **Rare edge case with the screen on.** When the app is open and visible, both the
-  in-app countdown and the scheduled alarm independently detect zero. In normal
-  operation the alarm fires first and plays the tone. Under the inexact fallback
-  it is theoretically possible for the in-app completion to cancel a not-yet-fired
-  alarm, which would suppress the tone in that one moment. This has not been
-  observed in testing on the Kompakt, where the alarm fires on time.
-- **The alarm tone is fixed.** It plays a repeating beep sequence (about six and a
-  half seconds) on the alarm audio stream at maximum volume. The tone and pattern
-  are not configurable, by design, to keep the app simple.
+- **The alarm rings until you stop it.** When a timer ends, a loud repeating tone
+  plays on the alarm audio stream until you tap **Stop alarm**, either in the app
+  (shown over the lock screen, with the display turned on) or on the notification.
+  As a safety cap, an alarm nobody stops goes quiet after 10 minutes and leaves a
+  notification saying so.
+- **The alarm plays at full alarm volume.** While it rings, the phone's alarm
+  volume is raised to maximum; your own setting is put back when the alarm stops.
+  The tone and volume are not configurable, by design, to keep the app simple.
+- **Screen wake depends on the system.** Turning the display on and showing the
+  Stop button over the lock screen uses Android's full-screen notification
+  mechanism. The sound does not depend on it.
 
 ## State and persistence
 

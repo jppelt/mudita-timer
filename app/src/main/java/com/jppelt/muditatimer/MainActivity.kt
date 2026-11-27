@@ -1,6 +1,7 @@
 package com.jppelt.muditatimer
 
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,6 +25,9 @@ class MainActivity : Activity() {
     private var remainingMs = DEFAULT_DURATION_MS
     private var elapsedMs   = 0L
 
+    // True while the end-of-timer alarm is sounding (state is DONE).
+    private var ringing = false
+
     // Numpad entry: up to 4 digits, filled from the right. Padded to "MMSS".
     private var customEntry = ""
 
@@ -38,6 +42,9 @@ class MainActivity : Activity() {
     private lateinit var tvCustomDisplay:       TextView
     private lateinit var tvCountdown:           TextView
     private lateinit var btnPauseResume:        Button
+    private lateinit var btnStopAlarm:          Button
+    private lateinit var btnStartAgain:         Button
+    private lateinit var btnBack:               Button
     private lateinit var tvStopwatch:           TextView
     private lateinit var btnStopwatchStartStop: Button
 
@@ -56,6 +63,9 @@ class MainActivity : Activity() {
                     } else {
                         remainingMs = ms
                         tvCountdown.text = formatRemaining(ms)
+                        // The service says a countdown is live; trust it over a
+                        // locally assumed "done".
+                        if (state == State.DONE && !ringing && ms > 0L) { state = State.RUNNING; render() }
                     }
                 }
                 TimerService.ACTION_STATE_PAUSED -> {
@@ -73,8 +83,11 @@ class MainActivity : Activity() {
                     remainingMs = 0
                     tvCountdown.text = formatRemaining(0L)
                     state = State.DONE
-                    prefs().edit().remove(PREF_END_TIME_MS).apply()
+                    setRinging(intent.getBooleanExtra(TimerService.EXTRA_RINGING, false))
                     render()
+                }
+                TimerService.ACTION_RING_STOPPED -> {
+                    if (ringing) { setRinging(false); render() }
                 }
             }
         }
@@ -89,6 +102,14 @@ class MainActivity : Activity() {
         loadMode()
         restoreState(savedInstanceState)
         wireListeners()
+        syncRingingFromPrefs()
+        render()
+    }
+
+    // The "time's up" notification brings an already-open instance back here.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        syncRingingFromPrefs()
         render()
     }
 
@@ -97,24 +118,36 @@ class MainActivity : Activity() {
         val filter = IntentFilter().apply {
             addAction(TimerService.ACTION_TICK)
             addAction(TimerService.ACTION_FINISHED)
+            addAction(TimerService.ACTION_RING_STOPPED)
             addAction(TimerService.ACTION_STATE_PAUSED)
         }
         registerReceiver(serviceReceiver, filter)
 
-        // If the timer expired while the app was backgrounded the broadcast was
-        // missed. Check the persisted end time and transition to DONE locally.
-        if (state == State.RUNNING) {
-            val endTimeMs = prefs().getLong(PREF_END_TIME_MS, 0L)
-            if (endTimeMs > 0L && System.currentTimeMillis() >= endTimeMs) {
-                remainingMs = 0
-                tvCountdown.text = formatRemaining(0L)
-                state = State.DONE
-                prefs().edit().remove(PREF_END_TIME_MS).apply()
-                render()
-                return
-            }
+        // The "alarm went quiet after 10 minutes" note has done its job once the app is open.
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(TimerService.MISSED_NOTIF_ID)
+
+        // Broadcasts are missed while the app is in the background, so catch up from
+        // the state TimerService persists.
+        syncRingingFromPrefs()
+        if (ringing) {
+            // Have the service confirm it is really still ringing; if it was killed
+            // mid-ring it clears the stale flag and this screen drops the Stop button.
+            sendToService(TimerService.ACTION_REQUEST_STATE)
+            render()
+            return
         }
 
+        // A countdown the service no longer has an end time for has finished (and its
+        // alarm was already stopped, or timed out) while the app was away.
+        if (state == State.RUNNING && prefs().getLong(TimerService.PREF_END_TIME_MS, 0L) <= 0L) {
+            remainingMs = 0
+            tvCountdown.text = formatRemaining(0L)
+            state = State.DONE
+            render()
+            return
+        }
+
+        render()
         if (state in setOf(State.RUNNING, State.PAUSED, State.STOPWATCH_RUNNING, State.STOPWATCH_PAUSED)) {
             sendToService(TimerService.ACTION_REQUEST_STATE)
         }
@@ -146,6 +179,9 @@ class MainActivity : Activity() {
         tvCustomDisplay       = findViewById(R.id.tvCustomDisplay)
         tvCountdown           = findViewById(R.id.tvCountdown)
         btnPauseResume        = findViewById(R.id.btnPauseResume)
+        btnStopAlarm          = findViewById(R.id.btnStopAlarm)
+        btnStartAgain         = findViewById(R.id.btnStartAgain)
+        btnBack               = findViewById(R.id.btnBack)
         tvStopwatch           = findViewById(R.id.tvStopwatch)
         btnStopwatchStartStop = findViewById(R.id.btnStopwatchStartStop)
     }
@@ -213,8 +249,13 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.btnReset).setOnClickListener { resetToSetup() }
 
         // Done screen
-        findViewById<Button>(R.id.btnStartAgain).setOnClickListener { startTimer(durationMs) }
-        findViewById<Button>(R.id.btnBack).setOnClickListener       { resetToSetup() }
+        btnStopAlarm.setOnClickListener {
+            sendToService(TimerService.ACTION_DISMISS)
+            setRinging(false)
+            render()
+        }
+        btnStartAgain.setOnClickListener { startTimer(durationMs) }
+        btnBack.setOnClickListener       { resetToSetup() }
 
         // Stopwatch controls
         btnStopwatchStartStop.setOnClickListener {
@@ -254,7 +295,10 @@ class MainActivity : Activity() {
         remainingMs      = ms
         tvCountdown.text = formatRemaining(ms)
         state            = State.RUNNING
-        prefs().edit().putLong(PREF_END_TIME_MS, System.currentTimeMillis() + ms).apply()
+        setRinging(false)
+        // TimerService owns this value from here on (it rewrites it on resume and
+        // clears it on pause/finish); written here too so it exists immediately.
+        prefs().edit().putLong(TimerService.PREF_END_TIME_MS, System.currentTimeMillis() + ms).apply()
         sendToService(TimerService.ACTION_START_TIMER) { putExtra(TimerService.EXTRA_DURATION_MS, ms) }
         render()
     }
@@ -269,7 +313,8 @@ class MainActivity : Activity() {
 
     private fun resetToSetup() {
         sendToService(TimerService.ACTION_RESET)
-        prefs().edit().remove(PREF_END_TIME_MS).apply()
+        prefs().edit().remove(TimerService.PREF_END_TIME_MS).apply()
+        setRinging(false)
         state            = State.SETUP
         remainingMs      = durationMs
         tvCountdown.text = formatRemaining(durationMs)
@@ -281,6 +326,29 @@ class MainActivity : Activity() {
             this.action = action
             extras()
         })
+    }
+
+    // ── Alarm ringing ────────────────────────────────────────────────────────
+
+    /**
+     * While the alarm sounds, this screen may turn the display on and sit above the
+     * lock screen so the Stop button is reachable without unlocking. Both
+     * allowances are dropped again the moment the alarm stops.
+     */
+    private fun setRinging(r: Boolean) {
+        ringing = r
+        setShowWhenLocked(r)
+        setTurnScreenOn(r)
+    }
+
+    private fun syncRingingFromPrefs() {
+        val r = prefs().getBoolean(TimerService.PREF_RINGING, false)
+        if (r) {
+            remainingMs = 0
+            tvCountdown.text = formatRemaining(0L)
+            state = State.DONE
+        }
+        if (r != ringing) setRinging(r)
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -305,6 +373,11 @@ class MainActivity : Activity() {
         findViewById<View>(R.id.dividerOr).visibility          = timerOnlyVisibility
         findViewById<View>(R.id.customPickerLayout).visibility = timerOnlyVisibility
         findViewById<View>(R.id.stopwatchSpacer).visibility    = if (inStopwatch) View.VISIBLE else View.GONE
+
+        // Done screen: only "Stop alarm" while it is sounding, then the usual choices.
+        btnStopAlarm.visibility  = if (ringing) View.VISIBLE else View.GONE
+        btnStartAgain.visibility = if (ringing) View.GONE else View.VISIBLE
+        btnBack.visibility       = if (ringing) View.GONE else View.VISIBLE
 
         btnPauseResume.text = getString(if (state == State.PAUSED) R.string.resume else R.string.pause)
         btnStopwatchStartStop.text = getString(
@@ -359,16 +432,14 @@ class MainActivity : Activity() {
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    private fun prefs() = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+    private fun prefs() = getSharedPreferences(TimerService.PREFS_NAME, MODE_PRIVATE)
 
     // ── Constants ────────────────────────────────────────────────────────────
 
     companion object {
         private const val DEFAULT_DURATION_MS = 25 * 60 * 1_000L
 
-        private const val PREFS_NAME          = "mudita_prefs"
         private const val PREF_LAST_MODE      = "last_mode"
-        private const val PREF_END_TIME_MS    = "end_time_ms"
 
         private const val KEY_STATE           = "state"
         private const val KEY_DURATION        = "duration"

@@ -12,8 +12,8 @@ A minimalist countdown timer for the [Mudita Kompakt](https://mudita.com/product
 - **Stopwatch** — MM:SS display, pause and resume, reset to zero
 - **Runs in the background** — a foreground service keeps the timer accurate when the screen is off or the app is backgrounded
 - **Pause and resume** — picks up exactly where you left off
-- **Audible alarm** — a loud, repeating tone when the timer ends, and it sounds even when the screen is locked
-- **No distractions** — no notifications beyond the required foreground service notice, no history, no settings, no accounts
+- **Audible alarm** — a loud, repeating tone that keeps ringing until you stop it, wakes the screen, and sounds even when the phone is locked
+- **No distractions** — no notifications beyond the required foreground service notice and the "time's up" alert, no history, no settings, no accounts
 - **Fully offline** — no network calls, no analytics, no permissions beyond what is necessary
 
 ---
@@ -92,13 +92,13 @@ Mudita Timer is built around three [Mudita Mindful Design](https://mudita.com/co
 
 **Simplicity** — One screen per task. No menus, no history, no configuration beyond what the timer actually needs.
 
-**Energy efficiency** — No animations anywhere in the UI. The screen updates once per second while the timer runs and is otherwise still. No network calls, no wakelocks.
+**Energy efficiency** — No animations anywhere in the UI. The screen updates once per second while the timer runs and is otherwise still. No network calls, and no wakelocks except while the alarm is ringing.
 
 ---
 
 ## Technical notes
 
-- Version: 1.5.2
+- Version: 1.6.0
 - Language: Kotlin
 - Minimum SDK: 28 (Android 9)
 - Target SDK: 31 (Android 12 — matches MuditaOS K)

@@ -20,6 +20,7 @@
 
     <!-- Done screen -->
     <string name="time_up">Time\'s up</string>
+    <string name="stop_alarm">Stop alarm</string>
     <string name="start_again">Start again</string>
     <string name="back">Back</string>
 
@@ -36,4 +37,7 @@
     <string name="notification_channel_name">Mudita Timer</string>
     <string name="notification_timer_running">Timer running</string>
     <string name="notification_stopwatch_running">Stopwatch running</string>
+    <string name="notification_channel_ring_name">Timer finished</string>
+    <string name="notification_ring_text">Tap Stop alarm to silence</string>
+    <string name="notification_missed_text">The alarm rang for 10 minutes and stopped</string>
 </resources>
