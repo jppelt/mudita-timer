@@ -1,6 +1,6 @@
 # Known Issues and Limitations
 
-This is an honest list of current limitations in Mudita Timer (v1.6.0). It is a
+This is an honest list of current limitations in Mudita Timer (v1.6.1). It is a
 small, single-purpose app built and tested specifically for the Mudita Kompakt.
 Nothing here prevents normal use; these are documented so expectations are clear.
 

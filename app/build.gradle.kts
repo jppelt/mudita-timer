@@ -20,8 +20,8 @@ android {
         applicationId = "com.jppelt.muditatimer"
         minSdk = 28
         targetSdk = 31
-        versionCode = 18
-        versionName = "1.6.0"
+        versionCode = 19
+        versionName = "1.6.1"
     }
 
     signingConfigs {
