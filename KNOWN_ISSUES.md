@@ -32,9 +32,10 @@ Nothing here prevents normal use; these are documented so expectations are clear
   (shown over the lock screen, with the display turned on) or on the notification.
   As a safety cap, an alarm nobody stops goes quiet after 10 minutes and leaves a
   notification saying so.
-- **The alarm plays at full alarm volume.** While it rings, the phone's alarm
-  volume is raised to maximum; your own setting is put back when the alarm stops.
-  The tone and volume are not configurable, by design, to keep the app simple.
+- **Alarm loudness follows the phone's alarm volume.** The alarm plays on the
+  alarm audio stream at whatever alarm volume the phone is set to. Adjust it in
+  the phone's sound settings, or with the volume keys while the alarm rings. The
+  tone itself is fixed and there is no in-app volume setting, by design.
 - **Screen wake depends on the system.** Turning the display on and showing the
   Stop button over the lock screen uses Android's full-screen notification
   mechanism. The sound does not depend on it.
