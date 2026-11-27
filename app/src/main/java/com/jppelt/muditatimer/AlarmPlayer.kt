@@ -17,8 +17,9 @@ import android.util.Log
  * alarm audio stream. Fallback path (only if MediaPlayer cannot start): the
  * ToneGenerator beep used before 1.6.0, repeated until stopped.
  *
- * The alarm plays at the phone's own alarm volume, so the user sets how loud it
- * is (system sound settings, or the volume keys while it rings). Setting
+ * The tone is attenuated in-app by [ALARM_GAIN] and otherwise plays at the
+ * phone's alarm volume (which the Kompakt does not appear to let the user
+ * lower, hence the in-app gain). Setting
  * [RING_AT_MAX_VOLUME] to true instead forces maximum while ringing and puts the
  * user's setting back on stop; on the Kompakt that proved far too loud.
  */
@@ -67,6 +68,7 @@ internal class AlarmPlayer(context: Context) {
                 mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             }
             mp.isLooping = true
+            mp.setVolume(ALARM_GAIN, ALARM_GAIN)
             mp.setOnErrorListener { _, what, extra ->
                 Log.w(TAG, "MediaPlayer error $what/$extra, switching to tone fallback")
                 releaseMediaPlayer()
@@ -156,6 +158,13 @@ internal class AlarmPlayer(context: Context) {
 
         /** false: use the phone's alarm volume. true: force full alarm volume, then restore. */
         private const val RING_AT_MAX_VOLUME = false
+
+        /**
+         * Loudness of the bundled tone, applied inside the app on top of whatever the
+         * alarm stream is set to. 1.0 is full scale (far too loud on the Kompakt);
+         * each halving sounds clearly quieter. Tune by ear on the device.
+         */
+        private const val ALARM_GAIN = 0.3f
 
         private const val TONE_ON_MS     = 900
         private const val TONE_PERIOD_MS = 1_300L
